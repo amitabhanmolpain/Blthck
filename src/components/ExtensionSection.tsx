@@ -21,17 +21,22 @@ const ExtensionSection: React.FC = () => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
+  const [hasAnimated, setHasAnimated] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
 
   // Intersection Observer to trigger animation when section is visible
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !isVisible) {
+        if (entry.isIntersecting && !hasAnimated) {
           setIsVisible(true);
+          setHasAnimated(true); // Ensure animation only runs once
         }
       },
-      { threshold: 0.3 }
+      { 
+        threshold: 0.3, // Trigger when 30% of the section is visible
+        rootMargin: '-50px 0px' // Add some margin for better UX
+      }
     );
 
     if (sectionRef.current) {
@@ -39,26 +44,36 @@ const ExtensionSection: React.FC = () => {
     }
 
     return () => observer.disconnect();
-  }, [isVisible]);
+  }, [hasAnimated]);
 
-  // Animate progress bar from 0 to 40% when section becomes visible
+  // Animate progress bar from 0 to 65% when section becomes visible
   useEffect(() => {
-    if (isVisible) {
-      const timer = setTimeout(() => {
-        const interval = setInterval(() => {
-          setProgress(prev => {
-            if (prev >= 40) {
-              clearInterval(interval);
-              return 40;
-            }
-            return prev + 1;
-          });
-        }, 50);
-      }, 500);
+    if (isVisible && !hasAnimated) {
+      // Start animation after a short delay
+      const startDelay = setTimeout(() => {
+        const targetProgress = 65; // Target percentage
+        const animationDuration = 2000; // 2 seconds
+        const steps = 60; // 60 steps for smooth animation
+        const increment = targetProgress / steps;
+        const stepDuration = animationDuration / steps;
 
-      return () => clearTimeout(timer);
+        let currentStep = 0;
+        const interval = setInterval(() => {
+          currentStep++;
+          const newProgress = Math.min(currentStep * increment, targetProgress);
+          setProgress(Math.round(newProgress));
+
+          if (currentStep >= steps) {
+            clearInterval(interval);
+          }
+        }, stepDuration);
+
+        return () => clearInterval(interval);
+      }, 800); // 800ms delay before starting animation
+
+      return () => clearTimeout(startDelay);
     }
-  }, [isVisible]);
+  }, [isVisible, hasAnimated]);
 
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -183,39 +198,68 @@ const ExtensionSection: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Development Progress Card - Properly Positioned */}
+                {/* Development Progress Card - Enhanced with Animation */}
                 <div className="bg-black/30 backdrop-blur-sm border border-white/20 rounded-lg p-4 shadow-lg mt-auto">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-white font-medium text-sm flex items-center">
                       <Code className="h-4 w-4 mr-2 text-blue-400" />
                       Development Progress
                     </span>
-                    <span className="text-orange-400 font-bold text-sm">{progress}%</span>
-                  </div>
-                  <div className="w-full bg-white/10 rounded-full h-3 mb-4 overflow-hidden">
-                    <div 
-                      className="bg-gradient-to-r from-orange-500 to-amber-500 h-3 rounded-full transition-all duration-100 ease-out" 
-                      style={{ width: `${progress}%` }}
-                    ></div>
+                    <span className={`font-bold text-sm transition-all duration-300 ${
+                      progress > 0 ? 'text-orange-400 scale-110' : 'text-gray-400'
+                    }`}>
+                      {progress}%
+                    </span>
                   </div>
                   
-                  {/* Development Stages */}
+                  {/* Enhanced Progress Bar with Glow Effect */}
+                  <div className="w-full bg-white/10 rounded-full h-3 mb-4 overflow-hidden relative">
+                    <div 
+                      className={`h-3 rounded-full transition-all duration-300 ease-out relative ${
+                        progress > 0 
+                          ? 'bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 shadow-lg' 
+                          : 'bg-gray-600'
+                      }`}
+                      style={{ width: `${progress}%` }}
+                    >
+                      {/* Animated shine effect */}
+                      {progress > 0 && (
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shine"></div>
+                      )}
+                    </div>
+                    
+                    {/* Progress glow effect */}
+                    {progress > 0 && (
+                      <div 
+                        className="absolute top-0 left-0 h-3 bg-gradient-to-r from-orange-400/50 to-yellow-400/50 rounded-full blur-sm transition-all duration-300"
+                        style={{ width: `${progress}%` }}
+                      ></div>
+                    )}
+                  </div>
+                  
+                  {/* Development Stages with Enhanced Animation */}
                   <div className="space-y-2 text-xs">
-                    <div className="flex items-center justify-between">
+                    <div className={`flex items-center justify-between transition-all duration-500 ${
+                      isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
+                    }`}>
                       <span className="flex items-center text-green-300">
                         <CheckCircle className="h-3 w-3 mr-1" />
                         Core AI Integration
                       </span>
-                      <span className="text-green-400">✓ Complete</span>
+                      <span className="text-green-400 font-medium">✓ Complete</span>
                     </div>
-                    <div className="flex items-center justify-between">
+                    <div className={`flex items-center justify-between transition-all duration-500 delay-200 ${
+                      isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
+                    }`}>
                       <span className="flex items-center text-orange-300">
                         <Activity className="h-3 w-3 mr-1 animate-pulse" />
                         Browser API Development
                       </span>
-                      <span className="text-orange-400">⚡ In Progress</span>
+                      <span className="text-orange-400 font-medium">⚡ In Progress</span>
                     </div>
-                    <div className="flex items-center justify-between">
+                    <div className={`flex items-center justify-between transition-all duration-500 delay-400 ${
+                      isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
+                    }`}>
                       <span className="flex items-center text-gray-400">
                         <Layers className="h-3 w-3 mr-1" />
                         UI/UX Design
@@ -339,8 +383,15 @@ const ExtensionSection: React.FC = () => {
           from { opacity: 0; transform: translateY(20px); }
           to { opacity: 1; transform: translateY(0); }
         }
+        @keyframes shine {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
         .animate-fade-in {
           animation: fade-in 0.5s ease-out;
+        }
+        .animate-shine {
+          animation: shine 2s ease-in-out infinite;
         }
       `}</style>
     </section>
