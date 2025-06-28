@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, Github, Twitter, Mail, Heart, Linkedin, Sparkles, Zap, Target, Brain } from 'lucide-react';
+import { Shield, Github, Twitter, Mail, Heart, Linkedin, Sparkles, Zap, Target, Brain, ExternalLink } from 'lucide-react';
 
 const Footer: React.FC = () => {
   return (
@@ -185,14 +185,35 @@ const Footer: React.FC = () => {
               </div>
             </div>
             
-            <div className="flex items-center space-x-4">
-              <p className="text-gray-400 text-sm flex items-center">
-                Made with <Heart className="h-4 w-4 text-red-500 mx-1 animate-pulse" /> for job seekers worldwide
-              </p>
-              <div className="h-4 w-px bg-gray-700"></div>
-              <p className="text-gray-500 text-sm font-medium">
-                Created by <span className="text-purple-400">Amitabh Anmol Pain</span>
-              </p>
+            <div className="flex flex-col lg:flex-row items-center space-y-4 lg:space-y-0 lg:space-x-6">
+              {/* Built by Bolt.new Badge */}
+              <a 
+                href="https://bolt.new" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="group inline-flex items-center px-4 py-2 bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 rounded-full text-sm font-medium text-orange-200 hover:from-orange-500/30 hover:to-red-500/30 hover:border-orange-400/50 transition-all duration-300 hover:scale-105 backdrop-blur-sm shadow-lg hover:shadow-orange-500/25"
+              >
+                <div className="flex items-center space-x-2">
+                  <div className="w-5 h-5 bg-gradient-to-r from-orange-400 to-red-400 rounded-md flex items-center justify-center">
+                    <Zap className="h-3 w-3 text-white" />
+                  </div>
+                  <span>Built by</span>
+                  <span className="font-bold bg-gradient-to-r from-orange-300 to-red-300 bg-clip-text text-transparent">
+                    Bolt.new
+                  </span>
+                  <ExternalLink className="h-3 w-3 text-orange-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300" />
+                </div>
+              </a>
+
+              <div className="flex items-center space-x-4">
+                <p className="text-gray-400 text-sm flex items-center">
+                  Made with <Heart className="h-4 w-4 text-red-500 mx-1 animate-pulse" /> for job seekers worldwide
+                </p>
+                <div className="h-4 w-px bg-gray-700"></div>
+                <p className="text-gray-500 text-sm font-medium">
+                  Created by <span className="text-purple-400">Amitabh Anmol Pain</span>
+                </p>
+              </div>
             </div>
           </div>
         </div>
