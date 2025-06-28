@@ -16,6 +16,7 @@ const Featured = () => {
   const [videoData, setVideoData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hoveredVideo, setHoveredVideo] = useState(null);
+  const [isSlideShowPaused, setIsSlideShowPaused] = useState(false); // ✅ New state to control slideshow
 
   // YouTube video URLs with mock data for demo
   const youtuberThumbnails = [
@@ -95,13 +96,16 @@ const Featured = () => {
     fetchVideoData();
   }, []);
 
-  // Auto-slide every 6 seconds
+  // ✅ Modified auto-slide to respect pause state
   useEffect(() => {
+    if (isSlideShowPaused) return; // Don't auto-slide when paused
+
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 2) % youtuberThumbnails.length);
     }, 6000);
+    
     return () => clearInterval(timer);
-  }, [youtuberThumbnails.length]);
+  }, [youtuberThumbnails.length, isSlideShowPaused]); // ✅ Added isSlideShowPaused dependency
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 2) % youtuberThumbnails.length);
@@ -117,6 +121,28 @@ const Featured = () => {
 
   const openVideo = (videoUrl) => {
     window.open(videoUrl, '_blank');
+  };
+
+  // ✅ Enhanced hover handlers to pause/resume slideshow
+  const handleVideoMouseEnter = (index) => {
+    setHoveredVideo(index);
+    setIsSlideShowPaused(true); // ✅ Pause slideshow when hovering any video
+  };
+
+  const handleVideoMouseLeave = () => {
+    setHoveredVideo(null);
+    setIsSlideShowPaused(false); // ✅ Resume slideshow when not hovering
+  };
+
+  // ✅ Pause slideshow when hovering over the entire slideshow container
+  const handleSlideShowMouseEnter = () => {
+    setIsSlideShowPaused(true);
+  };
+
+  const handleSlideShowMouseLeave = () => {
+    if (hoveredVideo === null) { // Only resume if not hovering a specific video
+      setIsSlideShowPaused(false);
+    }
   };
 
   const navigate = useNavigate();
@@ -176,9 +202,13 @@ const Featured = () => {
           </div>
         </div>
 
-        {/* Slideshow Container */}
+        {/* ✅ Enhanced Slideshow Container with Hover Handlers */}
         <div className="relative max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-6xl mx-auto">
-          <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-black/20 backdrop-blur-xl border border-white/10 shadow-2xl">
+          <div 
+            className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-black/20 backdrop-blur-xl border border-white/10 shadow-2xl"
+            onMouseEnter={handleSlideShowMouseEnter} // ✅ Pause on container hover
+            onMouseLeave={handleSlideShowMouseLeave} // ✅ Resume on container leave
+          >
             {isLoading ? (
               <div className="flex h-64 sm:h-80 md:h-96 items-center justify-center">
                 <div className="flex space-x-2">
@@ -197,8 +227,8 @@ const Featured = () => {
                     <div 
                       className="relative cursor-pointer group aspect-video overflow-hidden bg-black/30 rounded-xl sm:rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300"
                       onClick={() => openVideo(item.videoUrl)}
-                      onMouseEnter={() => setHoveredVideo(index)}
-                      onMouseLeave={() => setHoveredVideo(null)}
+                      onMouseEnter={() => handleVideoMouseEnter(index)} // ✅ Enhanced hover handler
+                      onMouseLeave={handleVideoMouseLeave} // ✅ Enhanced leave handler
                     >
                       {/* Video Thumbnail or Hover-play iframe */}
                       {hoveredVideo === index ? (
@@ -273,6 +303,13 @@ const Featured = () => {
             >
               <ChevronRight className="h-4 sm:h-5 w-4 sm:w-5" />
             </button>
+
+            {/* ✅ Slideshow Status Indicator (Optional - shows when paused) */}
+            {isSlideShowPaused && (
+              <div className="absolute top-2 right-2 px-2 py-1 bg-black/80 text-white text-xs rounded-md backdrop-blur-sm border border-white/10 z-20">
+                <span className="text-yellow-400">⏸ Paused</span>
+              </div>
+            )}
           </div>
 
           {/* Dots Indicator */}
