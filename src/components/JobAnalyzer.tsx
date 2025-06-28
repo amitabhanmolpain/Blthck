@@ -26,8 +26,10 @@ import {
   ChevronUp,
   ExternalLink,
   AlertCircle,
-  Info
+  Info,
+  PieChart
 } from 'lucide-react';
+import { PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, LineChart, Line, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend } from 'recharts';
 
 // Interfaces remain unchanged
 interface MLAnalysisResult {
@@ -410,6 +412,44 @@ const JobAnalyzer: React.FC = () => {
     return 'text-red-400';
   };
 
+  // Generate chart data based on results
+  const generateChartData = (result: MLAnalysisResult) => {
+    // Risk Distribution Pie Chart
+    const riskDistribution = [
+      { name: 'Ghost Indicators', value: result.ghostConditions.filter(c => c.detected).length, color: '#EF4444' },
+      { name: 'Positive Indicators', value: result.legitimateConditions.filter(c => c.detected).length, color: '#10B981' }
+    ];
+
+    // Model Confidence Bar Chart
+    const modelConfidence = result.mlModels.map(model => ({
+      name: model.name.split(' ')[0], // Shortened names
+      confidence: model.confidence,
+      prediction: model.prediction
+    }));
+
+    // Category Analysis Radar Chart
+    const categoryAnalysis = [
+      { category: 'Text Quality', score: result.detailedAnalysis.textAnalysis.specificityScore },
+      { category: 'Company Info', score: result.detailedAnalysis.companyAnalysis.legitimacyScore },
+      { category: 'Requirements', score: result.detailedAnalysis.requirementAnalysis.clarityScore },
+      { category: 'Timeline', score: result.detailedAnalysis.temporalAnalysis.timelineClarity },
+      { category: 'Contact Info', score: result.detailedAnalysis.companyAnalysis.contactInfoProvided ? 85 : 15 },
+      { category: 'Specificity', score: result.detailedAnalysis.textAnalysis.readabilityScore }
+    ];
+
+    // Risk Timeline (simulated data)
+    const riskTimeline = [
+      { stage: 'Initial', risk: 50 },
+      { stage: 'Text Analysis', risk: result.isGhostJob ? 70 : 30 },
+      { stage: 'Company Check', risk: result.isGhostJob ? 80 : 25 },
+      { stage: 'Final Score', risk: result.isGhostJob ? 85 : 20 }
+    ];
+
+    return { riskDistribution, modelConfidence, categoryAnalysis, riskTimeline };
+  };
+
+  const COLORS = ['#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#06B6D4'];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-black to-slate-950 relative overflow-hidden">
       {/* Animated Background */}
@@ -605,6 +645,121 @@ const JobAnalyzer: React.FC = () => {
                     </div>
                   ))}
                 </div>
+              </div>
+
+              {/* Comprehensive Charts Section */}
+              <div className="bg-black/10 backdrop-blur-lg border border-white/10 rounded-2xl p-8 shadow-xl">
+                <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
+                  <PieChart className="h-6 w-6 mr-3 text-indigo-400" />
+                  Analysis Visualizations
+                </h3>
+                
+                {(() => {
+                  const chartData = generateChartData(result);
+                  return (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                      {/* Risk Distribution Pie Chart */}
+                      <div className="bg-black/10 backdrop-blur-sm border border-white/10 rounded-xl p-6">
+                        <h4 className="text-lg font-semibold text-white mb-4 text-center">Risk Distribution</h4>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <RechartsPieChart>
+                            <Pie
+                              data={chartData.riskDistribution}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={60}
+                              outerRadius={120}
+                              paddingAngle={5}
+                              dataKey="value"
+                            >
+                              {chartData.riskDistribution.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.color} />
+                              ))}
+                            </Pie>
+                            <Tooltip />
+                            <Legend />
+                          </RechartsPieChart>
+                        </ResponsiveContainer>
+                      </div>
+
+                      {/* Model Confidence Bar Chart */}
+                      <div className="bg-black/10 backdrop-blur-sm border border-white/10 rounded-xl p-6">
+                        <h4 className="text-lg font-semibold text-white mb-4 text-center">Model Confidence</h4>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <BarChart data={chartData.modelConfidence}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                            <XAxis dataKey="name" stroke="#9CA3AF" />
+                            <YAxis stroke="#9CA3AF" />
+                            <Tooltip 
+                              contentStyle={{ 
+                                backgroundColor: '#1F2937', 
+                                border: '1px solid #374151',
+                                borderRadius: '8px',
+                                color: '#F9FAFB'
+                              }} 
+                            />
+                            <Bar dataKey="confidence" fill="#8B5CF6" radius={[4, 4, 0, 0]} />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+
+                      {/* Category Analysis Radar Chart */}
+                      <div className="bg-black/10 backdrop-blur-sm border border-white/10 rounded-xl p-6">
+                        <h4 className="text-lg font-semibold text-white mb-4 text-center">Category Analysis</h4>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <RadarChart data={chartData.categoryAnalysis}>
+                            <PolarGrid stroke="#374151" />
+                            <PolarAngleAxis dataKey="category" tick={{ fill: '#9CA3AF', fontSize: 12 }} />
+                            <PolarRadiusAxis domain={[0, 100]} tick={{ fill: '#9CA3AF', fontSize: 10 }} />
+                            <Radar
+                              name="Score"
+                              dataKey="score"
+                              stroke="#10B981"
+                              fill="#10B981"
+                              fillOpacity={0.2}
+                              strokeWidth={2}
+                            />
+                            <Tooltip 
+                              contentStyle={{ 
+                                backgroundColor: '#1F2937', 
+                                border: '1px solid #374151',
+                                borderRadius: '8px',
+                                color: '#F9FAFB'
+                              }} 
+                            />
+                          </RadarChart>
+                        </ResponsiveContainer>
+                      </div>
+
+                      {/* Risk Timeline */}
+                      <div className="bg-black/10 backdrop-blur-sm border border-white/10 rounded-xl p-6">
+                        <h4 className="text-lg font-semibold text-white mb-4 text-center">Risk Assessment Timeline</h4>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <LineChart data={chartData.riskTimeline}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                            <XAxis dataKey="stage" stroke="#9CA3AF" />
+                            <YAxis stroke="#9CA3AF" />
+                            <Tooltip 
+                              contentStyle={{ 
+                                backgroundColor: '#1F2937', 
+                                border: '1px solid #374151',
+                                borderRadius: '8px',
+                                color: '#F9FAFB'
+                              }} 
+                            />
+                            <Line 
+                              type="monotone" 
+                              dataKey="risk" 
+                              stroke={result.isGhostJob ? "#EF4444" : "#10B981"}
+                              strokeWidth={3}
+                              dot={{ r: 6, fill: result.isGhostJob ? "#EF4444" : "#10B981" }}
+                            />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
 
               {/* Detailed Analysis Sections */}

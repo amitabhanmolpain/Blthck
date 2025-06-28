@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Chrome, Download, Zap, Shield, Eye, CheckCircle, Send, Sparkles, Code, Layers, Activity } from 'lucide-react';
 import { CardSpotlight } from './CardSpotlight';
 
@@ -20,23 +20,45 @@ const ExtensionSection: React.FC = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
 
-  // Animate progress bar from 0 to 40%
+  // Intersection Observer to trigger animation when section is visible
   useEffect(() => {
-    const timer = setTimeout(() => {
-      const interval = setInterval(() => {
-        setProgress(prev => {
-          if (prev >= 40) {
-            clearInterval(interval);
-            return 40;
-          }
-          return prev + 1;
-        });
-      }, 50);
-    }, 1000);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !isVisible) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.3 }
+    );
 
-    return () => clearTimeout(timer);
-  }, []);
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [isVisible]);
+
+  // Animate progress bar from 0 to 40% when section becomes visible
+  useEffect(() => {
+    if (isVisible) {
+      const timer = setTimeout(() => {
+        const interval = setInterval(() => {
+          setProgress(prev => {
+            if (prev >= 40) {
+              clearInterval(interval);
+              return 40;
+            }
+            return prev + 1;
+          });
+        }, 50);
+      }, 500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isVisible]);
 
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,7 +99,7 @@ const ExtensionSection: React.FC = () => {
   ];
 
   return (
-    <section className="relative py-20 lg:py-32 overflow-hidden">
+    <section ref={sectionRef} className="relative py-20 lg:py-32 overflow-hidden">
       {/* Dark Theme Background matching Hero and Benefits */}
       <div className="absolute inset-0 bg-black"></div>
       
@@ -126,11 +148,12 @@ const ExtensionSection: React.FC = () => {
           </div>
         </div>
 
-        {/* Extension Preview */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-20">
-          <div>
-            <CardSpotlight className="h-96 w-full">
-              <div className="relative z-20">
+        {/* Extension Preview - Properly Aligned */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start mb-20">
+          {/* Left Column - Extension Preview */}
+          <div className="flex flex-col h-full">
+            <CardSpotlight className="flex-1 min-h-[500px] flex flex-col">
+              <div className="relative z-20 flex flex-col h-full">
                 <div className="flex items-center mb-6">
                   <div className="w-12 h-12 bg-black/20 backdrop-blur-xl rounded-xl flex items-center justify-center mr-4 shadow-lg border border-white/10">
                     <Chrome className="h-6 w-6 text-white" />
@@ -141,7 +164,7 @@ const ExtensionSection: React.FC = () => {
                   </div>
                 </div>
                 
-                <div className="space-y-4 mb-6">
+                <div className="space-y-4 mb-6 flex-1">
                   <div className="flex items-center text-gray-300">
                     <CheckCircle className="h-4 w-4 text-green-400 mr-3" />
                     <span className="text-sm">Instant job analysis on any website</span>
@@ -160,8 +183,8 @@ const ExtensionSection: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Fixed Development Progress Card */}
-                <div className="bg-black/30 backdrop-blur-sm border border-white/20 rounded-lg p-4 shadow-lg">
+                {/* Development Progress Card - Properly Positioned */}
+                <div className="bg-black/30 backdrop-blur-sm border border-white/20 rounded-lg p-4 shadow-lg mt-auto">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-white font-medium text-sm flex items-center">
                       <Code className="h-4 w-4 mr-2 text-blue-400" />
@@ -205,6 +228,7 @@ const ExtensionSection: React.FC = () => {
             </CardSpotlight>
           </div>
 
+          {/* Right Column - Features */}
           <div className="space-y-8">
             <div>
               <h3 className="text-2xl font-bold text-white mb-6">Extension Features</h3>

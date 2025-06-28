@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { ArrowRight, Sparkles, Brain } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { ArrowRight, Sparkles, Brain, ChevronDown } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Spotlight } from './ui/spotlight-new';
@@ -7,6 +7,16 @@ import { Spotlight } from './ui/spotlight-new';
 const Hero: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [showArrow, setShowArrow] = useState(false);
+
+  // Show arrow animation after component mounts
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowArrow(true);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // ✅ Trigger navigation after login if redirect flag is set
   useEffect(() => {
@@ -81,7 +91,7 @@ const Hero: React.FC = () => {
             </div>
           </div>
 
-          <div className="pt-8 animate-slide-up delay-600">
+          <div className="pt-8 animate-slide-up delay-600 relative">
             <button 
               onClick={handleStartAnalyzing}
               className="group relative inline-flex items-center px-12 py-6 bg-black/20 backdrop-blur-xl border border-white/20 text-white font-bold text-lg rounded-2xl shadow-2xl hover:bg-black/30 hover:border-white/30 transform hover:scale-105 transition-all duration-300 animate-glow"
@@ -93,6 +103,18 @@ const Hero: React.FC = () => {
                 <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-1 transition-transform duration-300" />
               </div>
             </button>
+
+            {/* Animated "Click Here" Arrow */}
+            {showArrow && (
+              <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 animate-bounce-in">
+                <div className="flex flex-col items-center space-y-2">
+                  <ChevronDown className="h-6 w-6 text-purple-400 animate-bounce" />
+                  <span className="text-sm text-purple-300 font-medium animate-pulse">
+                    Click Here
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -109,6 +131,11 @@ const Hero: React.FC = () => {
         @keyframes glow {
           0%, 100% { box-shadow: 0 0 20px rgba(147, 51, 234, 0.3); }
           50% { box-shadow: 0 0 40px rgba(147, 51, 234, 0.5); }
+        }
+        @keyframes bounce-in {
+          0% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+          50% { opacity: 0.5; transform: translateX(-50%) translateY(-10px); }
+          100% { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
         .animate-fade-in {
           animation: fade-in 1s ease-out;
@@ -128,6 +155,9 @@ const Hero: React.FC = () => {
         }
         .animate-glow {
           animation: glow 3s ease-in-out infinite;
+        }
+        .animate-bounce-in {
+          animation: bounce-in 1s ease-out forwards;
         }
       `}</style>
     </section>

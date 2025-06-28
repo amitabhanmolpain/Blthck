@@ -1,10 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Shield } from 'lucide-react';
 import JobAnalyzer from '../components/JobAnalyzer';
 import { useAuth } from '../contexts/AuthContext';
 
 const AnalyzerPage: React.FC = () => {
   const { user, loading } = useAuth();
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
 
   if (loading) {
     return (
