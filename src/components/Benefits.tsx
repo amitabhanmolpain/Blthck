@@ -10,21 +10,28 @@ import {
   Eye, 
   Lock, 
   Bell, 
-  Users 
+  Users,
+  Zap,
+  AlertTriangle,
+  Search,
+  FileCheck,
+  DollarSign,
+  Building,
+  BarChart3
 } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext'; // Added for authentication
-import { useNavigate } from 'react-router-dom'; // Added for navigation
+import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const Benefits = () => {
-  const { user } = useAuth(); // Get user from Auth context
-  const navigate = useNavigate(); // Initialize navigate hook
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   const handleStartProtecting = () => {
     if (user) {
-      navigate('/analyzer'); // Navigate to /analyzer in the same tab if authenticated
+      navigate('/analyzer');
     } else {
       const event = new CustomEvent('openAuthModal');
-      window.dispatchEvent(event); // Trigger auth modal for unauthenticated users
+      window.dispatchEvent(event);
     }
   };
 
@@ -32,129 +39,112 @@ const Benefits = () => {
     { 
       id: 1,
       icon: Clock, 
+      hoverIcon: Zap,
       title: "Save Time by Avoiding Fake Jobs", 
       description: "No more wasting hours applying to roles that will never be filled.", 
       color: "emerald",
-      size: "large", // Takes 2 columns
-      animation: "spin"
+      size: "large",
     },
     { 
       id: 2,
       icon: Target, 
+      hoverIcon: Search,
       title: "Apply Only to Genuine Opportunities", 
       description: "Focus your energy on real jobs with actual hiring potential.", 
       color: "blue",
       size: "medium",
-      animation: "pulse"
     },
     { 
       id: 3,
       icon: Shield, 
+      hoverIcon: Lock,
       title: "Avoid Scams and Data Harvesters", 
       description: "Stay protected from phishing job posts or those collecting your personal data.", 
       color: "purple",
       size: "medium",
-      animation: "bounce"
     },
     { 
       id: 4,
       icon: Brain, 
+      hoverIcon: TrendingUp,
       title: "Make Smarter Career Decisions", 
       description: "Ghostify helps you prioritize trustworthy companies with real hiring intent.", 
       color: "pink",
       size: "small",
-      animation: "wiggle"
     },
     { 
       id: 5,
       icon: CheckCircle, 
+      hoverIcon: Award,
       title: "Gain Confidence While Job Hunting", 
       description: "Know whether a job is real or fake before applying — no more second guessing.", 
       color: "green",
-      size: "large", // Takes 2 columns
-      animation: "spin" // Using spin as a fallback for checkmark
+      size: "large",
     },
     { 
       id: 6,
       icon: TrendingUp, 
+      hoverIcon: BarChart3,
       title: "Track Company Hiring Patterns", 
       description: "See if a company frequently posts but rarely hires — a major red flag.", 
       color: "orange",
       size: "small",
-      animation: "pulse"
     },
     { 
       id: 7,
       icon: Award, 
+      hoverIcon: CheckCircle,
       title: "Boost Your Success Rate", 
       description: "By applying to legitimate jobs only, you increase your chances of getting interviews.", 
       color: "yellow",
       size: "medium",
-      animation: "bounce"
     },
     { 
       id: 8,
       icon: Target, 
+      hoverIcon: Eye,
       title: "Use It Anywhere", 
       description: "Browser Extension + Web App. Scan jobs on LinkedIn, Indeed, or any site directly.", 
       color: "violet",
       size: "small",
-      animation: "pulse"
     },
     { 
       id: 9,
       icon: Eye, 
+      hoverIcon: Brain,
       title: "Stay Informed with AI-Powered Insights", 
       description: "Understand exactly why a job might be fake — with transparent explanations.", 
       color: "cyan",
       size: "medium",
-      animation: "spin"
     },
     { 
       id: 10,
       icon: Lock, 
+      hoverIcon: Shield,
       title: "Protect Your Resume & Personal Info", 
       description: "Don't share your data with fake employers or bots.", 
       color: "red",
       size: "medium",
-      animation: "bounce"
     },
     { 
       id: 11,
       icon: Bell, 
+      hoverIcon: AlertTriangle,
       title: "Get Alerts Before It's Too Late", 
       description: "Be notified when a job you've saved turns suspicious or gets flagged.", 
       color: "indigo",
       size: "small",
-      animation: "pulse"
     },
     { 
       id: 12,
       icon: Users, 
+      hoverIcon: Building,
       title: "Join a Safer Job-Seeking Community", 
       description: "Connect with others and share/report suspicious jobs to protect fellow job hunters.", 
       color: "teal",
-      size: "large", // Takes 2 columns
-      animation: "bounce"
+      size: "large",
     }
   ];
-
-  const getAnimationClasses = (animation) => {
-    const animations = {
-      spin: 'hover:animate-spin',
-      pulse: 'hover:animate-pulse',
-      bounce: 'hover:animate-bounce',
-      wiggle: 'hover:animate-wiggle', // Fallback to Tailwind's animation
-      checkmark: 'hover:animate-spin', // Fallback to spin
-      float: 'hover:animate-pulse', // Fallback to pulse
-      glow: 'hover:animate-pulse', // Fallback to pulse
-      blink: 'hover:animate-pulse', // Fallback to pulse
-      unlock: 'hover:animate-bounce', // Fallback to bounce
-      ring: 'hover:animate-pulse', // Fallback to pulse
-      wave: 'hover:animate-bounce' // Fallback to bounce
-    };
-    return animations[animation] || '';
-  };
 
   const getCardClasses = (size) => {
     const baseClasses = "group relative bg-black/20 backdrop-blur-2xl border border-white/10 rounded-3xl p-6 hover:bg-black/30 hover:border-white/20 transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl overflow-hidden";
@@ -238,10 +228,11 @@ const Benefits = () => {
                 
                 {/* Content */}
                 <div className="relative h-full flex flex-col">
-                  {/* Icon */}
+                  {/* Icon with hover change */}
                   <div className="flex justify-start mb-6">
                     <div className="relative w-16 h-16 bg-black/20 backdrop-blur-xl rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 border border-white/10">
-                      <benefit.icon className={`h-8 w-8 ${colorClasses.text} transition-all duration-300 ${getAnimationClasses(benefit.animation)}`} />
+                      <benefit.icon className={`h-8 w-8 ${colorClasses.text} transition-all duration-300 group-hover:opacity-0 group-hover:scale-0`} />
+                      <benefit.hoverIcon className={`h-8 w-8 ${colorClasses.text} absolute transition-all duration-300 opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-100`} />
                       <div className={`absolute inset-0 rounded-2xl bg-gradient-to-r ${colorClasses.bg} to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-lg`}></div>
                     </div>
                   </div>
