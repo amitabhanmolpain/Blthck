@@ -132,25 +132,25 @@ const Featured = () => {
   };
 
   return (
-    <section className="relative overflow-hidden min-h-screen flex items-center justify-center py-10 sm:py-16 md:py-20 gsap-fade-in" data-speed="0.5">
+    <section className="relative overflow-hidden min-h-screen flex items-center justify-center py-10 sm:py-16 md:py-20">
       {/* Dark Background */}
       <div className="absolute inset-0 bg-black"></div>
       
-      {/* Grid Pattern with parallax */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px] gsap-parallax" data-speed="0.2"></div>
+      {/* Grid Pattern */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
       
-      {/* Floating Elements with parallax */}
-      <div className="absolute top-10 left-4 w-1 h-1 bg-red-400/30 rounded-full animate-pulse sm:top-20 sm:left-8 sm:w-2 sm:h-2 gsap-parallax" data-speed="0.3"></div>
-      <div className="absolute top-16 right-6 w-1 h-1 bg-orange-400/30 rounded-full animate-bounce sm:top-24 sm:right-12 sm:w-2 sm:h-2 gsap-parallax" data-speed="0.4"></div>
-      <div className="absolute bottom-16 left-8 w-1 h-1 bg-amber-400/30 rounded-full animate-ping sm:bottom-20 sm:left-16 sm:w-2 sm:h-2 gsap-parallax" data-speed="0.2"></div>
-      <div className="absolute bottom-12 right-4 w-2 h-2 bg-yellow-400/30 rounded-full animate-pulse sm:bottom-24 sm:right-8 sm:w-3 sm:h-3 gsap-parallax" data-speed="0.5"></div>
-      <div className="absolute top-1/2 left-2 w-1 h-1 bg-orange-300/30 rounded-full animate-bounce sm:top-1/2 sm:left-4 sm:w-2 sm:h-2 gsap-parallax" data-speed="0.6"></div>
-      <div className="absolute top-1/3 right-2 w-1 h-1 bg-amber-300/30 rounded-full animate-ping sm:top-1/3 sm:right-4 sm:w-2 sm:h-2 gsap-parallax" data-speed="0.3"></div>
+      {/* Floating Elements */}
+      <div className="absolute top-10 left-4 w-1 h-1 bg-red-400/30 rounded-full animate-pulse sm:top-20 sm:left-8 sm:w-2 sm:h-2"></div>
+      <div className="absolute top-16 right-6 w-1 h-1 bg-orange-400/30 rounded-full animate-bounce sm:top-24 sm:right-12 sm:w-2 sm:h-2"></div>
+      <div className="absolute bottom-16 left-8 w-1 h-1 bg-amber-400/30 rounded-full animate-ping sm:bottom-20 sm:left-16 sm:w-2 sm:h-2"></div>
+      <div className="absolute bottom-12 right-4 w-2 h-2 bg-yellow-400/30 rounded-full animate-pulse sm:bottom-24 sm:right-8 sm:w-3 sm:h-3"></div>
+      <div className="absolute top-1/2 left-2 w-1 h-1 bg-orange-300/30 rounded-full animate-bounce sm:top-1/2 sm:left-4 sm:w-2 sm:h-2"></div>
+      <div className="absolute top-1/3 right-2 w-1 h-1 bg-amber-300/30 rounded-full animate-ping sm:top-1/3 sm:right-4 sm:w-2 sm:h-2"></div>
       
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
         {/* Section Header */}
-        <div className="text-center mb-8 sm:mb-12 gsap-slide-left">
-          <div className="inline-flex items-center px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-black/60 to-black/40 border border-red-500/30 rounded-full text-sm sm:text-base text-gray-300 backdrop-blur-xl shadow-2xl shadow-red-500/20 mb-4 sm:mb-6 hover:border-red-500/50 transition-all duration-500">
+        <div className="text-center mb-8 sm:mb-12">
+          <div className="inline-flex items-center px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-black/60 to-black/40 border border-red-500/30 rounded-full text-sm sm:text-base text-gray-300 backdrop-blur-xl shadow-2xl shadow-red-500/20 animate-fade-in mb-4 sm:mb-6 hover:border-red-500/50 transition-all duration-500">
             <AlertCircle className="h-4 sm:h-5 w-4 sm:w-5 mr-2 sm:mr-3 text-red-400 animate-pulse" />
             <span className="bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent font-semibold">
               Insights from Content Creators
@@ -159,15 +159,15 @@ const Featured = () => {
           </div>
           
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-4 sm:mb-6">
-            <span className="block text-white mb-2 sm:mb-4 gsap-slide-left drop-shadow-2xl">What YouTubers</span>
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-orange-400 to-amber-400 gsap-slide-right relative drop-shadow-2xl">
+            <span className="block text-white mb-2 sm:mb-4 animate-slide-up drop-shadow-2xl">What YouTubers</span>
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-orange-400 to-amber-400 animate-slide-up delay-200 relative drop-shadow-2xl">
               Say About Ghost Jobs
               <div className="absolute inset-0 bg-gradient-to-r from-red-400/20 via-orange-400/20 to-amber-400/20 blur-3xl animate-pulse-glow"></div>
             </span>
           </h2>
           
-          <div className="space-y-4 sm:space-y-6 gsap-fade-in">
-            <p className="text-lg sm:text-xl md:text-2xl text-white font-medium drop-shadow-lg gsap-text-reveal">
+          <div className="space-y-4 sm:space-y-6 animate-slide-up delay-400">
+            <p className="text-lg sm:text-xl md:text-2xl text-white font-medium drop-shadow-lg">
               Voices from the Community
             </p>
             <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-2xl sm:max-w-3xl mx-auto leading-relaxed drop-shadow-lg">
@@ -177,7 +177,7 @@ const Featured = () => {
         </div>
 
         {/* Slideshow Container */}
-        <div className="relative max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-6xl mx-auto gsap-scale">
+        <div className="relative max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-6xl mx-auto">
           <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-black/20 backdrop-blur-xl border border-white/10 shadow-2xl">
             {isLoading ? (
               <div className="flex h-64 sm:h-80 md:h-96 items-center justify-center">
@@ -276,7 +276,7 @@ const Featured = () => {
           </div>
 
           {/* Dots Indicator */}
-          <div className="flex justify-center mt-4 sm:mt-6 space-x-2 sm:space-x-3 gsap-fade-in">
+          <div className="flex justify-center mt-4 sm:mt-6 space-x-2 sm:space-x-3">
             {Array.from({ length: Math.ceil(youtuberThumbnails.length / 2) }).map((_, index) => (
               <button
                 key={index}
@@ -292,9 +292,9 @@ const Featured = () => {
         </div>
 
         {/* Call to Action */}
-        <div className="text-center mt-8 sm:mt-12 gsap-scale">
+        <div className="text-center mt-8 sm:mt-12 animate-slide-up delay-1000">
           <div className="bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl sm:rounded-3xl p-4 sm:p-6 max-w-xs sm:max-w-md md:max-w-lg mx-auto shadow-2xl">
-            <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 sm:mb-4 gsap-text-reveal">
+            <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 sm:mb-4">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-orange-400">
                 Join the Fight Against Ghost Jobs
               </span>
@@ -304,7 +304,7 @@ const Featured = () => {
             </p>
             <button 
               onClick={handleStartDetecting}
-              className="group relative inline-flex items-center px-6 sm:px-8 py-3 sm:py-4 bg-black/20 backdrop-blur-xl border border-white/20 text-white font-bold text-sm sm:text-lg rounded-xl sm:rounded-2xl shadow-2xl hover:bg-black/30 hover:border-white/30 transform hover:scale-105 transition-all duration-300"
+              className="group relative inline-flex items-center px-6 sm:px-8 py-3 sm:py-4 bg-black/20 backdrop-blur-xl border border-white/20 text-white font-bold text-sm sm:text-lg rounded-xl sm:rounded-2xl shadow-2xl hover:bg-black/30 hover:border-white/30 transform hover:scale-105 transition-all duration-300 animate-glow-red"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-red-500/20 via-orange-500/20 to-amber-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl sm:rounded-2xl"></div>
               <div className="relative flex items-center">
@@ -318,6 +318,55 @@ const Featured = () => {
       </div>
 
       <style jsx>{`
+        @keyframes fade-in {
+          from { opacity: 0; transform: translateY(-20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slide-up {
+          from { opacity: 0; transform: translateY(30px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes float {
+          0%, 100% { transform: translateY(0) scale(1); }
+          50% { transform: translateY(-10px) scale(1.1); }
+        }
+        @keyframes float-delayed {
+          0%, 100% { transform: translateY(0) scale(1); }
+          50% { transform: translateY(-15px) scale(1.2); }
+        }
+        @keyframes pulse-glow {
+          0%, 100% { opacity: 0.3; }
+          50% { opacity: 0.7; }
+        }
+        .animate-fade-in {
+          animation: fade-in 1s ease-out;
+        }
+        .animate-slide-up {
+          animation: slide-up 0.8s ease-out forwards;
+          opacity: 0;
+        }
+        .animate-float {
+          animation: float 3s ease-in-out infinite;
+        }
+        .animate-float-delayed {
+          animation: float-delayed 3s ease-in-out infinite;
+          animation-delay: 1.5s;
+        }
+        .animate-pulse-glow {
+          animation: pulse-glow 2s ease-in-out infinite;
+        }
+        .delay-100 {
+          animation-delay: 0.1s;
+        }
+        .delay-200 {
+          animation-delay: 0.2s;
+        }
+        .delay-400 {
+          animation-delay: 0.4s;
+        }
+        .delay-1000 {
+          animation-delay: 1.0s;
+        }
         .line-clamp-2 {
           display: -webkit-box;
           -webkit-line-clamp: 2;

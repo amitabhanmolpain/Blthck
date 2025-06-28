@@ -147,7 +147,7 @@ const Benefits = () => {
   ];
 
   const getCardClasses = (size) => {
-    const baseClasses = "group relative bg-black/20 backdrop-blur-2xl border border-white/10 rounded-3xl p-6 hover:bg-black/30 hover:border-white/20 transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl overflow-hidden gsap-stagger-item";
+    const baseClasses = "group relative bg-black/20 backdrop-blur-2xl border border-white/10 rounded-3xl p-6 hover:bg-black/30 hover:border-white/20 transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl overflow-hidden";
     
     switch (size) {
       case 'large':
@@ -180,9 +180,9 @@ const Benefits = () => {
   };
 
   return (
-    <section id="benefits" className="relative py-20 lg:py-32 overflow-hidden gsap-fade-in" data-speed="0.8">
+    <section id="benefits" className="relative py-20 lg:py-32 overflow-hidden">
       <div className="absolute inset-0 bg-black"></div>
-      <div className="absolute inset-0 gsap-parallax" data-speed="0.3">
+      <div className="absolute inset-0">
         <div className="absolute top-20 left-10 w-8 h-8 bg-white/5 rounded-lg rotate-12 animate-float"></div>
         <div className="absolute top-40 right-20 w-6 h-6 bg-white/5 rounded-full animate-bounce"></div>
         <div className="absolute bottom-32 left-16 w-10 h-10 bg-white/5 rounded-lg -rotate-12 animate-pulse"></div>
@@ -194,25 +194,25 @@ const Benefits = () => {
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16 gsap-slide-left">
+        <div className="text-center mb-16">
           <div className="inline-flex items-center px-6 py-3 bg-black/40 backdrop-blur-xl border border-white/10 rounded-full text-sm text-gray-300 mb-6 shadow-lg">
             <CheckCircle className="h-4 w-4 mr-2 text-emerald-400" />
             Why Choose Ghostify
           </div>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 gsap-text-reveal">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
             Benefits of Using
             <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-violet-400 to-indigo-400">
               Ghostify AI
             </span>
           </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto gsap-fade-in">
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
             Transform your job search with AI-powered verification that saves time, protects your data, and increases your success rate.
           </p>
         </div>
 
-        {/* Bento Grid Layout with GSAP stagger */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 auto-rows-max gsap-stagger">
+        {/* Bento Grid Layout */}
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 auto-rows-max">
           {benefits.map((benefit) => {
             const colorClasses = getColorClasses(benefit.color);
             return (
@@ -252,7 +252,7 @@ const Benefits = () => {
           })}
         </div>
 
-        <div className="text-center mt-16 gsap-scale">
+        <div className="text-center mt-16">
           <button 
             onClick={handleStartProtecting}
             className="inline-flex items-center px-8 py-4 bg-black/20 backdrop-blur-xl border border-white/20 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:shadow-purple-500/25 transform hover:scale-105 transition-all duration-300 cursor-pointer"

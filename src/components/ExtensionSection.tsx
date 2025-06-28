@@ -77,12 +77,12 @@ const ExtensionSection: React.FC = () => {
   ];
 
   return (
-    <section className="relative py-20 lg:py-32 overflow-hidden gsap-fade-in" data-speed="0.6">
+    <section className="relative py-20 lg:py-32 overflow-hidden">
       {/* Dark Theme Background matching Hero and Benefits */}
       <div className="absolute inset-0 bg-black"></div>
       
-      {/* Animated Background Elements with parallax */}
-      <div className="absolute inset-0 gsap-parallax" data-speed="0.4">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0">
         {/* Tech/Browser themed floating elements */}
         <div className="absolute top-20 left-12 w-8 h-8 bg-white/5 rounded-lg animate-pulse"></div>
         <div className="absolute top-40 right-20 w-6 h-6 bg-white/5 rounded-full animate-bounce"></div>
@@ -104,23 +104,23 @@ const ExtensionSection: React.FC = () => {
       
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center mb-16 gsap-slide-left">
+        <div className="text-center mb-16">
           <div className="inline-flex items-center px-6 py-3 bg-black/40 backdrop-blur-xl border border-white/10 rounded-full text-sm text-gray-300 mb-6 shadow-lg">
             <Chrome className="h-4 w-4 mr-2 text-blue-400" />
             Coming Soon
           </div>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 gsap-text-reveal">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
             Browser Extension
             <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-violet-400 to-indigo-400">
               In Development
             </span>
           </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8 gsap-fade-in">
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
             Our browser extension is currently in development with cutting-edge technology. 
             Analyze ghost jobs directly on any job board with one click.
           </p>
-          <div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-600/20 to-emerald-600/20 border border-green-500/30 rounded-full text-green-300 font-semibold backdrop-blur-xl gsap-scale">
+          <div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-600/20 to-emerald-600/20 border border-green-500/30 rounded-full text-green-300 font-semibold backdrop-blur-xl">
             <div className="w-2 h-2 bg-green-400 rounded-full mr-3 animate-pulse"></div>
             Stay Tuned - Launching Soon!
           </div>
@@ -128,7 +128,7 @@ const ExtensionSection: React.FC = () => {
 
         {/* Extension Preview */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-20">
-          <div className="gsap-slide-left">
+          <div>
             <CardSpotlight className="h-96 w-full">
               <div className="relative z-20">
                 <div className="flex items-center mb-6">
@@ -205,12 +205,12 @@ const ExtensionSection: React.FC = () => {
             </CardSpotlight>
           </div>
 
-          <div className="space-y-8 gsap-slide-right">
+          <div className="space-y-8">
             <div>
               <h3 className="text-2xl font-bold text-white mb-6">Extension Features</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 gsap-stagger">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {features.map((feature, index) => (
-                  <CardSpotlight key={index} className="h-auto gsap-stagger-item">
+                  <CardSpotlight key={index} className="h-auto">
                     <div className="relative z-20 text-center">
                       {/* Centered Icon with Beautiful Colors */}
                       <div className="flex justify-center mb-6">
@@ -229,22 +229,22 @@ const ExtensionSection: React.FC = () => {
         </div>
 
         {/* Browser Support */}
-        <div className="text-center mb-16 gsap-fade-in">
+        <div className="text-center mb-16">
           <h3 className="text-2xl font-bold text-white mb-8">Supported Browsers</h3>
-          <div className="flex justify-center items-center space-x-12 gsap-stagger">
-            <div className="text-center gsap-stagger-item">
+          <div className="flex justify-center items-center space-x-12">
+            <div className="text-center">
               <div className="w-16 h-16 bg-black/20 backdrop-blur-xl rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg border border-white/10">
                 <Chrome className="h-8 w-8 text-white" />
               </div>
               <p className="text-gray-300 font-medium">Chrome</p>
             </div>
-            <div className="text-center gsap-stagger-item">
+            <div className="text-center">
               <div className="w-16 h-16 bg-black/20 backdrop-blur-xl rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg border border-white/10">
                 <BraveIcon />
               </div>
               <p className="text-gray-300 font-medium">Brave</p>
             </div>
-            <div className="text-center gsap-stagger-item">
+            <div className="text-center">
               <div className="w-16 h-16 bg-black/20 backdrop-blur-xl rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg border border-white/10">
                 <EdgeIcon />
               </div>
@@ -254,7 +254,7 @@ const ExtensionSection: React.FC = () => {
         </div>
 
         {/* Enhanced Notification Signup with Animation */}
-        <div className="text-center gsap-scale">
+        <div className="text-center">
           <CardSpotlight className="max-w-2xl mx-auto">
             <div className="relative z-20 text-center">
               <h3 className="text-2xl font-bold text-white mb-4">Get Notified When It Launches</h3>

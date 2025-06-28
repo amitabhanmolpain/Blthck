@@ -20,9 +20,9 @@ const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="relative bg-black border-t border-white/10 text-white overflow-hidden gsap-fade-in" data-speed="0.9">
+    <footer className="relative bg-black border-t border-white/10 text-white overflow-hidden">
       {/* Animated Background */}
-      <div className="absolute inset-0 gsap-parallax" data-speed="0.1">
+      <div className="absolute inset-0">
         {/* Gradient overlays */}
         <div className="absolute inset-0 bg-gradient-to-br from-purple-900/10 via-black to-blue-900/10"></div>
         
@@ -41,7 +41,7 @@ const Footer: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-12">
           
           {/* Brand Section */}
-          <div className="lg:col-span-4 space-y-6 gsap-slide-left">
+          <div className="lg:col-span-4 space-y-6">
             <div className="flex items-center space-x-4">
               <div className="relative">
                 <div className="p-3 bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl shadow-lg">
@@ -70,16 +70,16 @@ const Footer: React.FC = () => {
             </p>
 
             {/* Key Stats */}
-            <div className="grid grid-cols-3 gap-4 pt-4 gsap-stagger">
-              <div className="text-center p-4 bg-black/20 backdrop-blur-sm rounded-xl border border-white/10 gsap-stagger-item">
+            <div className="grid grid-cols-3 gap-4 pt-4">
+              <div className="text-center p-4 bg-black/20 backdrop-blur-sm rounded-xl border border-white/10">
                 <div className="text-2xl font-bold text-purple-400">99.2%</div>
                 <div className="text-xs text-gray-400">Accuracy</div>
               </div>
-              <div className="text-center p-4 bg-black/20 backdrop-blur-sm rounded-xl border border-white/10 gsap-stagger-item">
+              <div className="text-center p-4 bg-black/20 backdrop-blur-sm rounded-xl border border-white/10">
                 <div className="text-2xl font-bold text-blue-400">500K+</div>
                 <div className="text-xs text-gray-400">Jobs Analyzed</div>
               </div>
-              <div className="text-center p-4 bg-black/20 backdrop-blur-sm rounded-xl border border-white/10 gsap-stagger-item">
+              <div className="text-center p-4 bg-black/20 backdrop-blur-sm rounded-xl border border-white/10">
                 <div className="text-2xl font-bold text-indigo-400">0.3s</div>
                 <div className="text-xs text-gray-400">Analysis Time</div>
               </div>
@@ -87,7 +87,7 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Product Links */}
-          <div className="lg:col-span-2 gsap-slide-left">
+          <div className="lg:col-span-2">
             <h4 className="text-lg font-bold text-white mb-6 flex items-center">
               <Target className="h-5 w-5 mr-2 text-purple-400" />
               Product
@@ -121,7 +121,7 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Resources */}
-          <div className="lg:col-span-2 gsap-slide-right">
+          <div className="lg:col-span-2">
             <h4 className="text-lg font-bold text-white mb-6">Resources</h4>
             <ul className="space-y-3">
               <li><a href="#" className="text-gray-400 hover:text-white transition-colors duration-300 hover:translate-x-1 transform inline-block">Ghost Job Guide</a></li>
@@ -133,19 +133,19 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Connect & Newsletter */}
-          <div className="lg:col-span-4 gsap-slide-right">
+          <div className="lg:col-span-4">
             <h4 className="text-lg font-bold text-white mb-6 flex items-center">
               <Users className="h-5 w-5 mr-2 text-pink-400" />
               Connect & Stay Updated
             </h4>
             
             {/* Social Links */}
-            <div className="flex space-x-4 mb-6 gsap-stagger">
+            <div className="flex space-x-4 mb-6">
               <a 
                 href="https://www.linkedin.com/in/amitabh-anmol-pain-118308309" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="group p-3 bg-black/20 backdrop-blur-sm border border-white/10 rounded-xl hover:bg-blue-600/20 hover:border-blue-500/30 transition-all duration-300 hover:scale-110 gsap-stagger-item"
+                className="group p-3 bg-black/20 backdrop-blur-sm border border-white/10 rounded-xl hover:bg-blue-600/20 hover:border-blue-500/30 transition-all duration-300 hover:scale-110"
               >
                 <Linkedin className="h-5 w-5 text-gray-400 group-hover:text-blue-400 transition-colors" />
               </a>
@@ -153,19 +153,19 @@ const Footer: React.FC = () => {
                 href="https://github.com/amitabhanmolpain" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="group p-3 bg-black/20 backdrop-blur-sm border border-white/10 rounded-xl hover:bg-gray-600/20 hover:border-gray-500/30 transition-all duration-300 hover:scale-110 gsap-stagger-item"
+                className="group p-3 bg-black/20 backdrop-blur-sm border border-white/10 rounded-xl hover:bg-gray-600/20 hover:border-gray-500/30 transition-all duration-300 hover:scale-110"
               >
                 <Github className="h-5 w-5 text-gray-400 group-hover:text-white transition-colors" />
               </a>
               <a 
                 href="#" 
-                className="group p-3 bg-black/20 backdrop-blur-sm border border-white/10 rounded-xl hover:bg-blue-500/20 hover:border-blue-400/30 transition-all duration-300 hover:scale-110 gsap-stagger-item"
+                className="group p-3 bg-black/20 backdrop-blur-sm border border-white/10 rounded-xl hover:bg-blue-500/20 hover:border-blue-400/30 transition-all duration-300 hover:scale-110"
               >
                 <Twitter className="h-5 w-5 text-gray-400 group-hover:text-blue-400 transition-colors" />
               </a>
               <a 
                 href="#" 
-                className="group p-3 bg-black/20 backdrop-blur-sm border border-white/10 rounded-xl hover:bg-purple-600/20 hover:border-purple-500/30 transition-all duration-300 hover:scale-110 gsap-stagger-item"
+                className="group p-3 bg-black/20 backdrop-blur-sm border border-white/10 rounded-xl hover:bg-purple-600/20 hover:border-purple-500/30 transition-all duration-300 hover:scale-110"
               >
                 <Mail className="h-5 w-5 text-gray-400 group-hover:text-purple-400 transition-colors" />
               </a>
@@ -212,7 +212,7 @@ const Footer: React.FC = () => {
         </div>
 
         {/* Bottom Section */}
-        <div className="border-t border-white/10 pt-8 gsap-fade-in">
+        <div className="border-t border-white/10 pt-8">
           <div className="flex flex-col lg:flex-row justify-between items-center space-y-4 lg:space-y-0">
             <div className="flex flex-col lg:flex-row items-center space-y-2 lg:space-y-0 lg:space-x-6">
               <p className="text-gray-400 text-sm">

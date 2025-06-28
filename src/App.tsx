@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { AuthProvider } from './contexts/AuthContext';
-import { useGSAP, useScrollAnimations } from './hooks/useGSAP';
 
 import Header from './components/Header';
 import Hero from './components/Hero';
@@ -14,10 +13,6 @@ import AuthModal from './components/AuthModal';
 const App: React.FC = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
-  // Initialize GSAP smooth scrolling
-  useGSAP();
-  useScrollAnimations();
-
   useEffect(() => {
     const handleOpenAuthModal = () => setIsAuthModalOpen(true);
 
@@ -30,22 +25,18 @@ const App: React.FC = () => {
 
   return (
     <AuthProvider>
-      <div id="smooth-wrapper">
-        <div id="smooth-content">
-          <div className="min-h-screen bg-black">
-            <Header />
-            <Hero />
-            <Benefits />
-            <WhyGhostJobs />
-            <ExtensionSection />
-            <Featured />
-            <Footer />
-            <AuthModal 
-              isOpen={isAuthModalOpen} 
-              onClose={() => setIsAuthModalOpen(false)} 
-            />
-          </div>
-        </div>
+      <div className="min-h-screen bg-black">
+        <Header />
+        <Hero />
+        <Benefits />
+        <WhyGhostJobs />
+        <ExtensionSection />
+        <Featured />
+        <Footer />
+        <AuthModal 
+          isOpen={isAuthModalOpen} 
+          onClose={() => setIsAuthModalOpen(false)} 
+        />
       </div>
     </AuthProvider>
   );
