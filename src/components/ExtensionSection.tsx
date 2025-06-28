@@ -21,16 +21,19 @@ const ExtensionSection: React.FC = () => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
-  const [hasAnimated, setHasAnimated] = useState(false);
+  const [animationKey, setAnimationKey] = useState(0); // Key to force re-animation
   const sectionRef = useRef<HTMLElement>(null);
 
   // Intersection Observer to trigger animation when section is visible
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !hasAnimated) {
+        if (entry.isIntersecting) {
           setIsVisible(true);
-          setHasAnimated(true); // Ensure animation only runs once
+          setAnimationKey(prev => prev + 1); // Force new animation each time
+        } else {
+          setIsVisible(false);
+          setProgress(0); // Reset progress when not visible
         }
       },
       { 
@@ -44,14 +47,17 @@ const ExtensionSection: React.FC = () => {
     }
 
     return () => observer.disconnect();
-  }, [hasAnimated]);
+  }, []);
 
-  // Animate progress bar from 0 to 65% when section becomes visible
+  // Animate progress bar from 0 to 30% when section becomes visible
   useEffect(() => {
-    if (isVisible && !hasAnimated) {
+    if (isVisible) {
+      // Reset progress first
+      setProgress(0);
+      
       // Start animation after a short delay
       const startDelay = setTimeout(() => {
-        const targetProgress = 65; // Target percentage
+        const targetProgress = 30; // Changed to 30% as requested
         const animationDuration = 2000; // 2 seconds
         const steps = 60; // 60 steps for smooth animation
         const increment = targetProgress / steps;
@@ -69,11 +75,11 @@ const ExtensionSection: React.FC = () => {
         }, stepDuration);
 
         return () => clearInterval(interval);
-      }, 800); // 800ms delay before starting animation
+      }, 500); // 500ms delay before starting animation
 
       return () => clearTimeout(startDelay);
     }
-  }, [isVisible, hasAnimated]);
+  }, [isVisible, animationKey]); // Include animationKey to trigger re-animation
 
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -205,7 +211,7 @@ const ExtensionSection: React.FC = () => {
                       <Code className="h-4 w-4 mr-2 text-blue-400" />
                       Development Progress
                     </span>
-                    <span className={`font-bold text-sm transition-all duration-300 ${
+                    <span className={`font-bold text-sm transition-all duration-500 ${
                       progress > 0 ? 'text-orange-400 scale-110' : 'text-gray-400'
                     }`}>
                       {progress}%
@@ -215,7 +221,7 @@ const ExtensionSection: React.FC = () => {
                   {/* Enhanced Progress Bar with Glow Effect */}
                   <div className="w-full bg-white/10 rounded-full h-3 mb-4 overflow-hidden relative">
                     <div 
-                      className={`h-3 rounded-full transition-all duration-300 ease-out relative ${
+                      className={`h-3 rounded-full transition-all duration-500 ease-out relative ${
                         progress > 0 
                           ? 'bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 shadow-lg' 
                           : 'bg-gray-600'
@@ -231,7 +237,7 @@ const ExtensionSection: React.FC = () => {
                     {/* Progress glow effect */}
                     {progress > 0 && (
                       <div 
-                        className="absolute top-0 left-0 h-3 bg-gradient-to-r from-orange-400/50 to-yellow-400/50 rounded-full blur-sm transition-all duration-300"
+                        className="absolute top-0 left-0 h-3 bg-gradient-to-r from-orange-400/50 to-yellow-400/50 rounded-full blur-sm transition-all duration-500"
                         style={{ width: `${progress}%` }}
                       ></div>
                     )}
@@ -239,7 +245,7 @@ const ExtensionSection: React.FC = () => {
                   
                   {/* Development Stages with Enhanced Animation */}
                   <div className="space-y-2 text-xs">
-                    <div className={`flex items-center justify-between transition-all duration-500 ${
+                    <div className={`flex items-center justify-between transition-all duration-700 ${
                       isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
                     }`}>
                       <span className="flex items-center text-green-300">
@@ -248,7 +254,7 @@ const ExtensionSection: React.FC = () => {
                       </span>
                       <span className="text-green-400 font-medium">✓ Complete</span>
                     </div>
-                    <div className={`flex items-center justify-between transition-all duration-500 delay-200 ${
+                    <div className={`flex items-center justify-between transition-all duration-700 delay-300 ${
                       isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
                     }`}>
                       <span className="flex items-center text-orange-300">
@@ -257,7 +263,7 @@ const ExtensionSection: React.FC = () => {
                       </span>
                       <span className="text-orange-400 font-medium">⚡ In Progress</span>
                     </div>
-                    <div className={`flex items-center justify-between transition-all duration-500 delay-400 ${
+                    <div className={`flex items-center justify-between transition-all duration-700 delay-500 ${
                       isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
                     }`}>
                       <span className="flex items-center text-gray-400">
