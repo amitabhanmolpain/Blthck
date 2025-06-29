@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import JobAnalyzer from '../components/JobAnalyzer';
 import { useAuth } from '../contexts/AuthContext';
 import { Spotlight } from '../components/ui/spotlight-new';
+import { AlertTriangle } from 'lucide-react';
 
 const AnalyzerPage: React.FC = () => {
   const { user, loading } = useAuth();
@@ -48,6 +49,16 @@ const AnalyzerPage: React.FC = () => {
       <div className="absolute bottom-40 right-10 w-4 h-4 bg-violet-400/30 rounded-full animate-pulse" />
 
       <div className="relative container mx-auto px-4 py-4 z-10">
+        {/* BETA Warning Message */}
+        <div className="text-center mb-6">
+          <div className="inline-flex items-center px-6 py-3 bg-amber-500/10 border border-amber-500/30 rounded-full text-amber-200 backdrop-blur-xl shadow-lg">
+            <AlertTriangle className="h-4 w-4 mr-2 text-amber-400" />
+            <span className="text-sm font-medium">
+              Ghostify is in its BETA state - it can make mistakes
+            </span>
+          </div>
+        </div>
+
         {/* Simple Welcome Message */}
         <div className="text-center mb-8">
           <p className="text-lg text-white font-medium">
