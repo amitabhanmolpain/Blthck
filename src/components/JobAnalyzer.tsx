@@ -13,7 +13,8 @@ import {
   Shield,
   Star,
   Award,
-  Verified
+  Verified,
+  UserCheck
 } from 'lucide-react';
 
 interface AnalysisResult {
@@ -107,6 +108,76 @@ const JobAnalyzer: React.FC = () => {
     return { isTrusted: false, companyName: null };
   };
 
+  const checkMutualConnections = (text: string): { hasMutuals: boolean; connectionType: string | null } => {
+    const normalizedText = text.toLowerCase();
+    
+    // Patterns that indicate mutual connections or referrals
+    const mutualPatterns = [
+      // Direct mutual connection mentions
+      /mutual\s+(connection|contact|friend|colleague)/i,
+      /common\s+(connection|contact|colleague)/i,
+      /shared\s+(connection|contact|colleague)/i,
+      
+      // Referral patterns
+      /referred\s+by/i,
+      /referral\s+from/i,
+      /recommended\s+by/i,
+      /introduced\s+by/i,
+      
+      // Internal referral patterns
+      /internal\s+referral/i,
+      /employee\s+referral/i,
+      /team\s+member\s+referral/i,
+      
+      // LinkedIn connection patterns
+      /linkedin\s+connection/i,
+      /connected\s+on\s+linkedin/i,
+      /mutual\s+linkedin/i,
+      
+      // Professional network patterns
+      /professional\s+network/i,
+      /network\s+connection/i,
+      /through\s+our\s+network/i,
+      
+      // Alumni connections
+      /alumni\s+connection/i,
+      /fellow\s+alumni/i,
+      /university\s+connection/i,
+      
+      // Former colleague patterns
+      /former\s+colleague/i,
+      /previous\s+colleague/i,
+      /worked\s+together/i,
+      
+      // Direct mentions of people working there
+      /people\s+you\s+know\s+work/i,
+      /friends\s+who\s+work/i,
+      /colleagues\s+who\s+work/i,
+      /someone\s+you\s+know\s+works/i
+    ];
+
+    for (const pattern of mutualPatterns) {
+      if (pattern.test(normalizedText)) {
+        // Determine the type of connection
+        if (/referral|referred|recommended/i.test(normalizedText)) {
+          return { hasMutuals: true, connectionType: 'Employee Referral' };
+        } else if (/linkedin/i.test(normalizedText)) {
+          return { hasMutuals: true, connectionType: 'LinkedIn Connection' };
+        } else if (/alumni/i.test(normalizedText)) {
+          return { hasMutuals: true, connectionType: 'Alumni Network' };
+        } else if (/colleague|worked\s+together/i.test(normalizedText)) {
+          return { hasMutuals: true, connectionType: 'Former Colleague' };
+        } else if (/mutual|common|shared/i.test(normalizedText)) {
+          return { hasMutuals: true, connectionType: 'Mutual Connection' };
+        } else {
+          return { hasMutuals: true, connectionType: 'Professional Network' };
+        }
+      }
+    }
+    
+    return { hasMutuals: false, connectionType: null };
+  };
+
   const analyzeJobPosting = (text: string): AnalysisResult => {
     const factors: AnalysisResult['factors'] = [];
     let totalScore = 0;
@@ -115,6 +186,35 @@ const JobAnalyzer: React.FC = () => {
     // Check for trusted company first
     const trustedCompanyCheck = checkTrustedCompany(text);
     
+    // Check for mutual connections
+    const mutualConnectionsCheck = checkMutualConnections(text);
+    
+    // Network & Connections Analysis
+    const networkFactors = [];
+    
+    if (mutualConnectionsCheck.hasMutuals) {
+      networkFactors.push({
+        factor: 'Mutual Connections',
+        status: 'good' as const,
+        description: `${mutualConnectionsCheck.connectionType} mentioned - strong indicator of legitimacy`,
+        weight: 20 // High weight for mutual connections
+      });
+      totalScore += 20;
+    } else {
+      networkFactors.push({
+        factor: 'Network Connections',
+        status: 'warning' as const,
+        description: 'No mutual connections or referrals mentioned',
+        weight: 0
+      });
+    }
+    maxScore += 20;
+
+    factors.push({
+      category: 'Network & Connections',
+      items: networkFactors
+    });
+
     // Company Analysis
     const companyFactors = [];
     
@@ -147,6 +247,11 @@ const JobAnalyzer: React.FC = () => {
       }
     }
     maxScore += 25;
+
+    factors.push({
+      category: 'Company Verification',
+      items: companyFactors
+    });
 
     // Text Analysis
     const textFactors = [];
@@ -201,11 +306,6 @@ const JobAnalyzer: React.FC = () => {
       });
     }
     maxScore += 12;
-
-    factors.push({
-      category: 'Company Verification',
-      items: companyFactors
-    });
 
     factors.push({
       category: 'Job Description Quality',
@@ -346,22 +446,25 @@ const JobAnalyzer: React.FC = () => {
     const scorePercentage = Math.round((totalScore / maxScore) * 100);
     const confidence = Math.min(95, Math.max(60, scorePercentage + Math.random() * 10));
     
-    // Adjust thresholds based on trusted company status
+    // Adjust thresholds based on trusted company status and mutual connections
     let isGhostJob: boolean;
     let summary: string;
     
-    if (trustedCompanyCheck.isTrusted) {
-      // More lenient for trusted companies
-      isGhostJob = scorePercentage < 40;
-      if (scorePercentage >= 70) {
+    const hasStrongIndicators = trustedCompanyCheck.isTrusted || mutualConnectionsCheck.hasMutuals;
+    
+    if (hasStrongIndicators) {
+      // More lenient for trusted companies or jobs with mutual connections
+      isGhostJob = scorePercentage < 35;
+      
+      if (trustedCompanyCheck.isTrusted && mutualConnectionsCheck.hasMutuals) {
+        summary = `Excellent opportunity! This job is from ${trustedCompanyCheck.companyName}, a trusted company, AND you have ${mutualConnectionsCheck.connectionType?.toLowerCase()}. This is very likely legitimate.`;
+      } else if (trustedCompanyCheck.isTrusted) {
         summary = `This appears to be a legitimate job posting from ${trustedCompanyCheck.companyName}, a trusted company. The posting meets most quality standards.`;
-      } else if (scorePercentage >= 40) {
-        summary = `This job posting is from ${trustedCompanyCheck.companyName}, a reputable company, but has some areas that could be improved for clarity.`;
-      } else {
-        summary = `While this is posted by ${trustedCompanyCheck.companyName}, a trusted company, the job description lacks important details and may need verification.`;
+      } else if (mutualConnectionsCheck.hasMutuals) {
+        summary = `Strong legitimacy indicator: You have ${mutualConnectionsCheck.connectionType?.toLowerCase()} at this company. Jobs through personal networks are typically genuine.`;
       }
     } else {
-      // Standard thresholds for unknown companies
+      // Standard thresholds for unknown companies without connections
       isGhostJob = scorePercentage < 60;
       if (scorePercentage >= 75) {
         summary = 'This appears to be a legitimate job posting with comprehensive details and professional presentation.';
@@ -374,10 +477,18 @@ const JobAnalyzer: React.FC = () => {
 
     const recommendations: string[] = [];
     
+    if (mutualConnectionsCheck.hasMutuals) {
+      recommendations.push(`🤝 Leverage your ${mutualConnectionsCheck.connectionType?.toLowerCase()}: Reach out to your connection for insider insights about the role and company culture`);
+    }
+    
     if (trustedCompanyCheck.isTrusted) {
       recommendations.push(`✅ Verified company: ${trustedCompanyCheck.companyName} is a well-established, reputable organization`);
     } else {
       recommendations.push('🔍 Research the company thoroughly - check their website, LinkedIn, and recent news');
+    }
+    
+    if (!mutualConnectionsCheck.hasMutuals) {
+      recommendations.push('🌐 Try to find mutual connections on LinkedIn who work at this company for additional validation');
     }
     
     if (!hasSalary) {
@@ -432,6 +543,8 @@ const JobAnalyzer: React.FC = () => {
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
+      case 'Network & Connections':
+        return <UserCheck className="h-5 w-5" />;
       case 'Company Verification':
         return <Building className="h-5 w-5" />;
       case 'Job Description Quality':
@@ -468,7 +581,9 @@ const JobAnalyzer: React.FC = () => {
           <textarea
             value={jobDescription}
             onChange={(e) => setJobDescription(e.target.value)}
-            placeholder="Paste the complete job posting here, including company name, job title, requirements, responsibilities, and any other details..."
+            placeholder="Paste the complete job posting here, including company name, job title, requirements, responsibilities, and any other details...
+
+💡 Pro tip: If you have mutual connections at the company or were referred by someone, mention that in the description for more accurate analysis!"
             className="w-full h-64 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none backdrop-blur-sm"
           />
           
