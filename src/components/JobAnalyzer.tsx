@@ -616,16 +616,16 @@ Note: I was referred to this position by my former colleague, Mike Chen, who cur
         </p>
       </div>
 
-      {/* Input Section */}
-      <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8">
+      {/* Input Section - BLACK GLASS THEME */}
+      <div className="bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-8">
         <div className="space-y-6">
           <div className="flex items-center justify-between">
-            <label className="text-lg font-semibold text-gray-800">
+            <label className="text-lg font-semibold text-white">
               Job Description Analysis
             </label>
             <button
               onClick={handleUseSample}
-              className="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-medium rounded-lg hover:shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center space-x-2"
+              className="px-4 py-2 bg-black/30 backdrop-blur-xl border border-white/20 text-white text-sm font-medium rounded-lg hover:bg-black/40 hover:border-white/30 transform hover:scale-105 transition-all duration-300 flex items-center space-x-2 shadow-lg"
             >
               <Eye className="h-4 w-4" />
               <span>Use Sample Job</span>
@@ -644,13 +644,13 @@ Note: I was referred to this position by my former colleague, Mike Chen, who cur
 • Include any specific requirements or qualifications listed
 
 Example: 'Software Engineer at Google - I was referred by my colleague John who works there...'"
-            className="w-full h-80 px-6 py-4 border border-gray-200 rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-sm leading-relaxed"
+            className="w-full h-80 px-6 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-white/30 resize-none text-sm leading-relaxed shadow-inner"
           />
           
           <button
             onClick={handleAnalyze}
             disabled={!jobDescription.trim() || isAnalyzing}
-            className="w-full py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold text-lg rounded-xl hover:shadow-lg hover:shadow-purple-500/25 transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-3"
+            className="w-full py-4 bg-black/30 backdrop-blur-xl border border-white/20 text-white font-bold text-lg rounded-xl hover:bg-black/40 hover:border-white/30 hover:shadow-lg hover:shadow-purple-500/25 transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-3 shadow-lg"
           >
             {isAnalyzing ? (
               <>
@@ -676,34 +676,34 @@ Example: 'Software Engineer at Google - I was referred by my colleague John who 
         </div>
       </div>
 
-      {/* Loading Animation */}
+      {/* Loading Animation - BLACK GLASS THEME */}
       {isAnalyzing && (
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8">
+        <div className="bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-8">
           <div className="text-center space-y-6">
             <div className="flex justify-center">
               <div className="relative">
-                <div className="w-20 h-20 border-4 border-purple-200 rounded-full"></div>
-                <div className="absolute inset-0 w-20 h-20 border-4 border-transparent border-t-purple-600 rounded-full animate-spin"></div>
-                <div className="absolute inset-2 w-16 h-16 border-4 border-transparent border-t-blue-500 rounded-full animate-spin animate-reverse"></div>
+                <div className="w-20 h-20 border-4 border-white/20 rounded-full"></div>
+                <div className="absolute inset-0 w-20 h-20 border-4 border-transparent border-t-purple-400 rounded-full animate-spin"></div>
+                <div className="absolute inset-2 w-16 h-16 border-4 border-transparent border-t-blue-400 rounded-full animate-spin animate-reverse"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <Brain className="h-8 w-8 text-purple-600 animate-pulse" />
+                  <Brain className="h-8 w-8 text-purple-400 animate-pulse" />
                 </div>
               </div>
             </div>
             
             <div className="space-y-3">
-              <h3 className="text-xl font-bold text-gray-800">AI Analysis in Progress</h3>
+              <h3 className="text-xl font-bold text-white">AI Analysis in Progress</h3>
               <div className="space-y-2">
-                <div className="flex items-center justify-center space-x-2 text-gray-600">
-                  <Zap className="h-4 w-4 text-yellow-500 animate-pulse" />
+                <div className="flex items-center justify-center space-x-2 text-gray-300">
+                  <Zap className="h-4 w-4 text-yellow-400 animate-pulse" />
                   <span className="text-sm">Processing job description...</span>
                 </div>
-                <div className="flex items-center justify-center space-x-2 text-gray-600">
-                  <TrendingUp className="h-4 w-4 text-green-500 animate-pulse" />
+                <div className="flex items-center justify-center space-x-2 text-gray-300">
+                  <TrendingUp className="h-4 w-4 text-green-400 animate-pulse" />
                   <span className="text-sm">Analyzing 100+ detection factors...</span>
                 </div>
-                <div className="flex items-center justify-center space-x-2 text-gray-600">
-                  <Shield className="h-4 w-4 text-blue-500 animate-pulse" />
+                <div className="flex items-center justify-center space-x-2 text-gray-300">
+                  <Shield className="h-4 w-4 text-blue-400 animate-pulse" />
                   <span className="text-sm">Generating comprehensive report...</span>
                 </div>
               </div>
@@ -712,20 +712,20 @@ Example: 'Software Engineer at Google - I was referred by my colleague John who 
         </div>
       )}
 
-      {/* Results Section */}
+      {/* Results Section - BLACK GLASS THEME */}
       {analysis && !isAnalyzing && (
         <div className="space-y-8 animate-fade-in">
-          {/* Overall Result */}
-          <div className={`bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border-2 p-8 ${
+          {/* Overall Result - BLACK GLASS */}
+          <div className={`bg-black/20 backdrop-blur-xl border-2 rounded-2xl shadow-2xl p-8 ${
             analysis.isGhostJob 
-              ? 'border-red-300 bg-red-50/50' 
-              : 'border-emerald-300 bg-emerald-50/50'
+              ? 'border-red-400/50 bg-red-900/10' 
+              : 'border-emerald-400/50 bg-emerald-900/10'
           }`}>
             <div className="flex items-start space-x-6">
-              <div className={`p-4 rounded-2xl ${
+              <div className={`p-4 rounded-2xl backdrop-blur-xl border ${
                 analysis.isGhostJob 
-                  ? 'bg-red-100 text-red-600' 
-                  : 'bg-emerald-100 text-emerald-600'
+                  ? 'bg-red-500/20 text-red-400 border-red-400/30' 
+                  : 'bg-emerald-500/20 text-emerald-400 border-emerald-400/30'
               }`}>
                 {analysis.isGhostJob ? (
                   <AlertTriangle className="h-12 w-12" />
@@ -737,29 +737,29 @@ Example: 'Software Engineer at Google - I was referred by my colleague John who 
               <div className="flex-1">
                 <div className="flex items-center space-x-4 mb-4">
                   <h2 className={`text-3xl font-bold ${
-                    analysis.isGhostJob ? 'text-red-700' : 'text-emerald-700'
+                    analysis.isGhostJob ? 'text-red-400' : 'text-emerald-400'
                   }`}>
                     {analysis.isGhostJob ? 'Potential Ghost Job' : 'Likely Legitimate Job'}
                   </h2>
-                  <div className="flex items-center space-x-2 px-4 py-2 bg-white/60 rounded-full">
-                    <span className="text-gray-600 font-medium">Confidence:</span>
-                    <span className="text-2xl font-bold text-gray-800">{analysis.confidence}%</span>
+                  <div className="flex items-center space-x-2 px-4 py-2 bg-black/30 backdrop-blur-xl border border-white/20 rounded-full">
+                    <span className="text-gray-300 font-medium">Confidence:</span>
+                    <span className="text-2xl font-bold text-white">{analysis.confidence}%</span>
                   </div>
                 </div>
                 
-                <p className="text-gray-700 text-lg leading-relaxed">
+                <p className="text-gray-300 text-lg leading-relaxed">
                   {analysis.summary}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Detailed Analysis */}
+          {/* Detailed Analysis - BLACK GLASS CARDS */}
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {analysis.factors.map((category, categoryIndex) => (
-              <div key={categoryIndex} className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6">
-                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center space-x-2">
-                  <div className="p-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg text-white">
+              <div key={categoryIndex} className="bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-6 hover:bg-black/30 hover:border-white/20 transform hover:scale-105 transition-all duration-300">
+                <h3 className="text-lg font-bold text-white mb-4 flex items-center space-x-2">
+                  <div className="p-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg text-white shadow-lg">
                     {category.category === 'Network & Connections' && <UserCheck className="h-4 w-4" />}
                     {category.category === 'Company Verification' && <Building className="h-4 w-4" />}
                     {category.category === 'Job Description Quality' && <FileText className="h-4 w-4" />}
@@ -772,16 +772,16 @@ Example: 'Software Engineer at Google - I was referred by my colleague John who 
                 
                 <div className="space-y-3">
                   {category.items.map((item, itemIndex) => (
-                    <div key={itemIndex} className="flex items-start space-x-3 p-3 bg-gray-50/80 rounded-lg border border-gray-100">
+                    <div key={itemIndex} className="flex items-start space-x-3 p-3 bg-black/30 backdrop-blur-sm rounded-lg border border-white/10 hover:bg-black/40 transition-all duration-300">
                       {getStatusIcon(item.status)}
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-1">
-                          <span className="font-semibold text-gray-800 text-sm">{item.factor}</span>
-                          <span className="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded-full">
+                          <span className="font-semibold text-white text-sm">{item.factor}</span>
+                          <span className="text-xs text-gray-400 bg-black/40 backdrop-blur-sm px-2 py-1 rounded-full border border-white/10">
                             +{item.weight}
                           </span>
                         </div>
-                        <p className="text-gray-600 text-xs leading-relaxed">{item.description}</p>
+                        <p className="text-gray-300 text-xs leading-relaxed">{item.description}</p>
                       </div>
                     </div>
                   ))}
@@ -790,20 +790,20 @@ Example: 'Software Engineer at Google - I was referred by my colleague John who 
             ))}
           </div>
 
-          {/* Recommendations */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8">
+          {/* Recommendations - BLACK GLASS */}
+          <div className="bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-8">
             <div className="flex items-center space-x-3 mb-6">
-              <div className="p-3 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl text-white">
+              <div className="p-3 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl text-white shadow-lg">
                 <Star className="h-6 w-6" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-800">Recommendations</h3>
+              <h3 className="text-2xl font-bold text-white">Recommendations</h3>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {analysis.recommendations.map((recommendation, index) => (
-                <div key={index} className="flex items-start space-x-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100">
+                <div key={index} className="flex items-start space-x-3 p-4 bg-black/30 backdrop-blur-sm rounded-lg border border-white/10 hover:bg-black/40 hover:border-white/20 transition-all duration-300">
                   <div className="text-2xl flex-shrink-0">{recommendation.split(' ')[0]}</div>
-                  <p className="text-gray-700 text-sm leading-relaxed font-medium">
+                  <p className="text-gray-300 text-sm leading-relaxed font-medium">
                     {recommendation.substring(recommendation.indexOf(' ') + 1)}
                   </p>
                 </div>
