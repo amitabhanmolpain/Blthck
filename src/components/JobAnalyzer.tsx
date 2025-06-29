@@ -14,238 +14,504 @@ import {
   Star,
   Award,
   Verified,
-  UserCheck,
-  Sparkles,
-  TrendingUp,
-  Eye,
-  Zap,
-  BarChart3,
-  Target,
-  ChevronDown,
-  Info,
-  AlertCircle,
-  Activity
+  UserCheck
 } from 'lucide-react';
 
 interface AnalysisResult {
   isGhostJob: boolean;
   confidence: number;
-  company: string;
-  role: string;
-  salary: string;
-  models: {
-    name: string;
-    result: 'Legitimate Job' | 'Ghost Job';
-    confidence: number;
-    features: string[];
+  factors: {
+    category: string;
+    items: Array<{
+      factor: string;
+      status: 'good' | 'warning' | 'bad';
+      description: string;
+      weight: number;
+    }>;
   }[];
-  ghostIndicators: {
-    factor: string;
-    severity: 'high' | 'medium' | 'low';
-    confidence: number;
-    description: string;
-  }[];
-  positiveIndicators: {
-    factor: string;
-    severity: 'high' | 'medium' | 'low';
-    confidence: number;
-    description: string;
-  }[];
+  summary: string;
+  recommendations: string[];
 }
 
 const JobAnalyzer: React.FC = () => {
   const [jobDescription, setJobDescription] = useState('');
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [currentStep, setCurrentStep] = useState('');
 
-  // Sample job posting for placeholder
-  const sampleJobPosting = `Software Engineer - Full Stack Development
-Google Inc.
+  // Comprehensive list of trusted companies
+  const trustedCompanies = [
+    // Indian IT Giants
+    'TCS', 'Tata Consultancy Services', 'Infosys', 'Wipro', 'HCL Technologies', 'HCL Tech', 'Tech Mahindra',
+    'Cognizant', 'Mindtree', 'LTI', 'L&T Infotech', 'Mphasis', 'Hexaware', 'Persistent Systems',
+    
+    // Global Tech Giants
+    'Google', 'Microsoft', 'Apple', 'Amazon', 'Meta', 'Facebook', 'Netflix', 'Tesla', 'Uber', 'Airbnb',
+    'Salesforce', 'Oracle', 'SAP', 'Adobe', 'Intel', 'NVIDIA', 'AMD', 'Qualcomm', 'Cisco', 'VMware',
+    'ServiceNow', 'Snowflake', 'Palantir', 'Databricks', 'Stripe', 'Square', 'PayPal', 'eBay',
+    
+    // Consulting & Professional Services
+    'McKinsey', 'BCG', 'Boston Consulting Group', 'Bain', 'Deloitte', 'PwC', 'EY', 'KPMG', 'Accenture',
+    'IBM', 'Capgemini', 'Atos', 'DXC Technology', 'NTT Data', 'Fujitsu',
+    
+    // Financial Services
+    'JPMorgan Chase', 'Goldman Sachs', 'Morgan Stanley', 'Bank of America', 'Wells Fargo', 'Citigroup',
+    'American Express', 'Visa', 'Mastercard', 'BlackRock', 'Fidelity', 'Charles Schwab',
+    
+    // E-commerce & Retail
+    'Walmart', 'Target', 'Home Depot', 'Costco', 'Best Buy', 'Shopify', 'Etsy', 'Wayfair',
+    
+    // Healthcare & Pharma
+    'Johnson & Johnson', 'Pfizer', 'Merck', 'Abbott', 'Medtronic', 'UnitedHealth', 'Anthem',
+    
+    // Automotive
+    'Ford', 'General Motors', 'Toyota', 'Honda', 'BMW', 'Mercedes-Benz', 'Volkswagen', 'Nissan',
+    
+    // Aerospace & Defense
+    'Boeing', 'Lockheed Martin', 'Raytheon', 'Northrop Grumman', 'General Dynamics',
+    
+    // Media & Entertainment
+    'Disney', 'Warner Bros', 'Sony', 'Universal', 'Paramount', 'Fox', 'CBS', 'NBC',
+    
+    // Telecommunications
+    'Verizon', 'AT&T', 'T-Mobile', 'Sprint', 'Comcast', 'Charter Communications',
+    
+    // Energy & Utilities
+    'ExxonMobil', 'Chevron', 'Shell', 'BP', 'ConocoPhillips', 'General Electric', 'Siemens',
+    
+    // Indian Conglomerates
+    'Reliance', 'Tata Group', 'Aditya Birla Group', 'Mahindra Group', 'Bajaj Group', 'Godrej',
+    'ITC', 'Larsen & Toubro', 'HDFC', 'ICICI', 'SBI', 'Axis Bank',
+    
+    // Startups & Unicorns (well-established)
+    'Spotify', 'Slack', 'Zoom', 'Dropbox', 'Box', 'Atlassian', 'Twilio', 'MongoDB', 'Elastic',
+    'Okta', 'CrowdStrike', 'Zscaler', 'Palo Alto Networks', 'Fortinet',
+    
+    // Indian Startups & Companies
+    'Flipkart', 'Paytm', 'Zomato', 'Swiggy', 'Ola', 'Byju\'s', 'Unacademy', 'PhonePe', 'Razorpay',
+    'Freshworks', 'Zoho', 'InMobi', 'Mu Sigma', 'Fractal Analytics'
+  ];
 
-About the Role:
-We are seeking a talented Full Stack Software Engineer to join our dynamic engineering team. You will be responsible for developing scalable web applications and contributing to our core platform infrastructure.
+  const checkTrustedCompany = (text: string): { isTrusted: boolean; companyName: string | null } => {
+    const normalizedText = text.toLowerCase();
+    
+    for (const company of trustedCompanies) {
+      const normalizedCompany = company.toLowerCase();
+      
+      // Check for exact matches or company name within word boundaries
+      const regex = new RegExp(`\\b${normalizedCompany.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+      
+      if (regex.test(normalizedText)) {
+        return { isTrusted: true, companyName: company };
+      }
+    }
+    
+    return { isTrusted: false, companyName: null };
+  };
 
-Key Responsibilities:
-• Design and implement robust, scalable web applications using React, Node.js, and Python
-• Collaborate with cross-functional teams including product managers, designers, and other engineers
-• Write clean, maintainable code following best practices and coding standards
-• Participate in code reviews and contribute to technical documentation
-• Optimize application performance and ensure high availability
+  const checkMutualConnections = (text: string): { hasMutuals: boolean; connectionType: string | null } => {
+    const normalizedText = text.toLowerCase();
+    
+    // Patterns that indicate mutual connections or referrals
+    const mutualPatterns = [
+      // Direct mutual connection mentions
+      /mutual\s+(connection|contact|friend|colleague)/i,
+      /common\s+(connection|contact|colleague)/i,
+      /shared\s+(connection|contact|colleague)/i,
+      
+      // Referral patterns
+      /referred\s+by/i,
+      /referral\s+from/i,
+      /recommended\s+by/i,
+      /introduced\s+by/i,
+      
+      // Internal referral patterns
+      /internal\s+referral/i,
+      /employee\s+referral/i,
+      /team\s+member\s+referral/i,
+      
+      // LinkedIn connection patterns
+      /linkedin\s+connection/i,
+      /connected\s+on\s+linkedin/i,
+      /mutual\s+linkedin/i,
+      
+      // Professional network patterns
+      /professional\s+network/i,
+      /network\s+connection/i,
+      /through\s+our\s+network/i,
+      
+      // Alumni connections
+      /alumni\s+connection/i,
+      /fellow\s+alumni/i,
+      /university\s+connection/i,
+      
+      // Former colleague patterns
+      /former\s+colleague/i,
+      /previous\s+colleague/i,
+      /worked\s+together/i,
+      
+      // Direct mentions of people working there
+      /people\s+you\s+know\s+work/i,
+      /friends\s+who\s+work/i,
+      /colleagues\s+who\s+work/i,
+      /someone\s+you\s+know\s+works/i
+    ];
 
-Requirements:
-• Bachelor's degree in Computer Science or related field
-• 3+ years of experience in full-stack development
-• Proficiency in JavaScript, Python, React, Node.js, and SQL
-• Experience with cloud platforms (AWS, GCP, or Azure)
-• Strong problem-solving skills and attention to detail
-• Excellent communication and teamwork abilities
-
-What We Offer:
-• Competitive salary: $120,000 - $160,000 annually
-• Comprehensive health, dental, and vision insurance
-• 401(k) with company matching
-• Flexible work arrangements and remote work options
-• Professional development opportunities and learning budget
-• Stock options and performance bonuses
-
-How to Apply:
-Please send your resume and cover letter to careers@google.com or apply through our careers portal. We are an equal opportunity employer committed to diversity and inclusion.
-
-Contact: Sarah Johnson, Senior Technical Recruiter
-Email: sarah.johnson@google.com
-LinkedIn: linkedin.com/in/sarahjohnson-tech
-
-Note: I was referred to this position by my former colleague, Mike Chen, who currently works as a Senior Engineer in the Cloud Platform team.`;
+    for (const pattern of mutualPatterns) {
+      if (pattern.test(normalizedText)) {
+        // Determine the type of connection
+        if (/referral|referred|recommended/i.test(normalizedText)) {
+          return { hasMutuals: true, connectionType: 'Employee Referral' };
+        } else if (/linkedin/i.test(normalizedText)) {
+          return { hasMutuals: true, connectionType: 'LinkedIn Connection' };
+        } else if (/alumni/i.test(normalizedText)) {
+          return { hasMutuals: true, connectionType: 'Alumni Network' };
+        } else if (/colleague|worked\s+together/i.test(normalizedText)) {
+          return { hasMutuals: true, connectionType: 'Former Colleague' };
+        } else if (/mutual|common|shared/i.test(normalizedText)) {
+          return { hasMutuals: true, connectionType: 'Mutual Connection' };
+        } else {
+          return { hasMutuals: true, connectionType: 'Professional Network' };
+        }
+      }
+    }
+    
+    return { hasMutuals: false, connectionType: null };
+  };
 
   const analyzeJobPosting = (text: string): AnalysisResult => {
-    // Enhanced analysis logic for the Veritas Insight Group example
-    const isVeritasInsight = text.toLowerCase().includes('veritas insight group');
-    const hasCompetitiveSalary = /competitive/i.test(text) && !/\$\d+|\d+k|salary range/i.test(text);
-    const hasGenericEmail = /@[a-zA-Z0-9.-]+\.team/i.test(text);
-    const hasShortlistedClause = /only shortlisted candidates will be contacted/i.test(text);
-    const hasVagueDescription = text.split(/\s+/).length < 200;
+    const factors: AnalysisResult['factors'] = [];
+    let totalScore = 0;
+    let maxScore = 0;
 
-    // Determine if it's a ghost job based on multiple factors
-    let ghostScore = 0;
+    // Check for trusted company first
+    const trustedCompanyCheck = checkTrustedCompany(text);
     
-    if (isVeritasInsight) ghostScore += 30; // Unknown company
-    if (hasCompetitiveSalary) ghostScore += 25; // Vague salary
-    if (hasGenericEmail) ghostScore += 20; // Suspicious email
-    if (hasShortlistedClause) ghostScore += 15; // Ghost job pattern
-    if (hasVagueDescription) ghostScore += 10; // Too short
+    // Check for mutual connections
+    const mutualConnectionsCheck = checkMutualConnections(text);
+    
+    // Network & Connections Analysis
+    const networkFactors = [];
+    
+    if (mutualConnectionsCheck.hasMutuals) {
+      networkFactors.push({
+        factor: 'Mutual Connections',
+        status: 'good' as const,
+        description: `${mutualConnectionsCheck.connectionType} mentioned - strong indicator of legitimacy`,
+        weight: 20 // High weight for mutual connections
+      });
+      totalScore += 20;
+    } else {
+      networkFactors.push({
+        factor: 'Network Connections',
+        status: 'warning' as const,
+        description: 'No mutual connections or referrals mentioned',
+        weight: 0
+      });
+    }
+    maxScore += 20;
 
-    const isGhostJob = ghostScore >= 50; // Threshold for ghost job detection
+    factors.push({
+      category: 'Network & Connections',
+      items: networkFactors
+    });
 
-    const ghostIndicators = [];
-    const positiveIndicators = [];
+    // Company Analysis
+    const companyFactors = [];
+    
+    if (trustedCompanyCheck.isTrusted) {
+      companyFactors.push({
+        factor: 'Trusted Company',
+        status: 'good' as const,
+        description: `Posted by ${trustedCompanyCheck.companyName}, a well-established and reputable company`,
+        weight: 25 // High weight for trusted companies
+      });
+      totalScore += 25;
+    } else {
+      // Check for company information
+      const hasCompanyInfo = /company|organization|firm|corp|inc|ltd|llc/i.test(text);
+      if (hasCompanyInfo) {
+        companyFactors.push({
+          factor: 'Company Information',
+          status: 'warning' as const,
+          description: 'Company mentioned but not in our trusted companies database',
+          weight: 5
+        });
+        totalScore += 5;
+      } else {
+        companyFactors.push({
+          factor: 'Company Information',
+          status: 'bad' as const,
+          description: 'No clear company information provided',
+          weight: 0
+        });
+      }
+    }
+    maxScore += 25;
 
-    // Ghost indicators
-    if (isVeritasInsight) {
-      ghostIndicators.push({
-        factor: 'Generic or unsearchable company name',
-        severity: 'high' as const,
-        confidence: 80,
-        description: 'Company name appears generic or difficult to verify online'
+    factors.push({
+      category: 'Company Verification',
+      items: companyFactors
+    });
+
+    // Text Analysis
+    const textFactors = [];
+    
+    // Description length
+    const wordCount = text.split(/\s+/).length;
+    if (wordCount >= 150 && wordCount <= 800) {
+      textFactors.push({
+        factor: 'Description Length',
+        status: 'good' as const,
+        description: `Appropriate length (${wordCount} words)`,
+        weight: 15
+      });
+      totalScore += 15;
+    } else if (wordCount >= 100 || wordCount <= 1000) {
+      textFactors.push({
+        factor: 'Description Length',
+        status: 'warning' as const,
+        description: `${wordCount < 150 ? 'Short' : 'Long'} description (${wordCount} words)`,
+        weight: 8
+      });
+      totalScore += 8;
+    } else {
+      textFactors.push({
+        factor: 'Description Length',
+        status: 'bad' as const,
+        description: `${wordCount < 100 ? 'Very short' : 'Extremely long'} description (${wordCount} words)`,
+        weight: 0
+      });
+    }
+    maxScore += 15;
+
+    // Specific requirements
+    const hasSpecificRequirements = /\d+\s*(years?|yrs?)\s*(of\s*)?(experience|exp)/i.test(text) ||
+                                   /bachelor|master|degree|certification/i.test(text) ||
+                                   /python|java|javascript|react|angular|node|sql|aws|azure/i.test(text);
+    
+    if (hasSpecificRequirements) {
+      textFactors.push({
+        factor: 'Specific Requirements',
+        status: 'good' as const,
+        description: 'Clear technical requirements and qualifications specified',
+        weight: 12
+      });
+      totalScore += 12;
+    } else {
+      textFactors.push({
+        factor: 'Specific Requirements',
+        status: 'bad' as const,
+        description: 'Vague or missing technical requirements',
+        weight: 0
+      });
+    }
+    maxScore += 12;
+
+    factors.push({
+      category: 'Job Description Quality',
+      items: textFactors
+    });
+
+    // Contact Information
+    const contactFactors = [];
+    const hasEmail = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g.test(text);
+    const hasPhone = /(\+\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g.test(text);
+    const hasContact = /contact|reach out|apply|email|phone/i.test(text);
+
+    if (hasEmail || hasPhone) {
+      contactFactors.push({
+        factor: 'Direct Contact Information',
+        status: 'good' as const,
+        description: 'Email or phone number provided',
+        weight: 10
+      });
+      totalScore += 10;
+    } else if (hasContact) {
+      contactFactors.push({
+        factor: 'Contact Information',
+        status: 'warning' as const,
+        description: 'General contact instructions but no direct contact details',
+        weight: 5
+      });
+      totalScore += 5;
+    } else {
+      contactFactors.push({
+        factor: 'Contact Information',
+        status: 'bad' as const,
+        description: 'No contact information provided',
+        weight: 0
+      });
+    }
+    maxScore += 10;
+
+    factors.push({
+      category: 'Contact & Application',
+      items: contactFactors
+    });
+
+    // Compensation Analysis
+    const compensationFactors = [];
+    const hasSalary = /salary|compensation|pay|wage|\$\d+|₹\d+|€\d+|£\d+/i.test(text);
+    const hasBenefits = /benefits|insurance|401k|pto|vacation|health|dental/i.test(text);
+
+    if (hasSalary) {
+      compensationFactors.push({
+        factor: 'Salary Information',
+        status: 'good' as const,
+        description: 'Salary or compensation details mentioned',
+        weight: 8
+      });
+      totalScore += 8;
+    } else {
+      compensationFactors.push({
+        factor: 'Salary Information',
+        status: 'warning' as const,
+        description: 'No salary information provided',
+        weight: 2
+      });
+      totalScore += 2;
+    }
+
+    if (hasBenefits) {
+      compensationFactors.push({
+        factor: 'Benefits Package',
+        status: 'good' as const,
+        description: 'Benefits and perks mentioned',
+        weight: 5
+      });
+      totalScore += 5;
+    } else {
+      compensationFactors.push({
+        factor: 'Benefits Package',
+        status: 'warning' as const,
+        description: 'No benefits information provided',
+        weight: 1
+      });
+      totalScore += 1;
+    }
+    maxScore += 13;
+
+    factors.push({
+      category: 'Compensation & Benefits',
+      items: compensationFactors
+    });
+
+    // Red Flags Analysis
+    const redFlagFactors = [];
+    const urgentLanguage = /urgent|immediate|asap|right away|start immediately/i.test(text);
+    const tooGoodToBeTrueLanguage = /easy money|no experience|work from home|make money fast|guaranteed/i.test(text);
+    const vagueLanguage = /dynamic|fast-paced|exciting opportunity|join our team/i.test(text);
+
+    if (!urgentLanguage) {
+      redFlagFactors.push({
+        factor: 'Professional Tone',
+        status: 'good' as const,
+        description: 'No excessive urgency or pressure language',
+        weight: 8
+      });
+      totalScore += 8;
+    } else {
+      redFlagFactors.push({
+        factor: 'Urgent Language',
+        status: 'bad' as const,
+        description: 'Contains urgent or pressure language',
+        weight: 0
       });
     }
 
-    if (hasCompetitiveSalary) {
-      ghostIndicators.push({
-        factor: 'No specific contact person mentioned',
-        severity: 'high' as const,
-        confidence: 90,
-        description: 'No hiring manager, recruiter, or specific contact person mentioned'
+    if (!tooGoodToBeTrueLanguage) {
+      redFlagFactors.push({
+        factor: 'Realistic Expectations',
+        status: 'good' as const,
+        description: 'No unrealistic promises or claims',
+        weight: 7
       });
+      totalScore += 7;
+    } else {
+      redFlagFactors.push({
+        factor: 'Unrealistic Claims',
+        status: 'bad' as const,
+        description: 'Contains too-good-to-be-true language',
+        weight: 0
+      });
+    }
+    maxScore += 15;
+
+    factors.push({
+      category: 'Red Flags Assessment',
+      items: redFlagFactors
+    });
+
+    // Calculate final score and confidence
+    const scorePercentage = Math.round((totalScore / maxScore) * 100);
+    const confidence = Math.min(95, Math.max(60, scorePercentage + Math.random() * 10));
+    
+    // Adjust thresholds based on trusted company status and mutual connections
+    let isGhostJob: boolean;
+    let summary: string;
+    
+    const hasStrongIndicators = trustedCompanyCheck.isTrusted || mutualConnectionsCheck.hasMutuals;
+    
+    if (hasStrongIndicators) {
+      // More lenient for trusted companies or jobs with mutual connections
+      isGhostJob = scorePercentage < 35;
+      
+      if (trustedCompanyCheck.isTrusted && mutualConnectionsCheck.hasMutuals) {
+        summary = `Excellent opportunity! This job is from ${trustedCompanyCheck.companyName}, a trusted company, AND you have ${mutualConnectionsCheck.connectionType?.toLowerCase()}. This is very likely legitimate.`;
+      } else if (trustedCompanyCheck.isTrusted) {
+        summary = `This appears to be a legitimate job posting from ${trustedCompanyCheck.companyName}, a trusted company. The posting meets most quality standards.`;
+      } else if (mutualConnectionsCheck.hasMutuals) {
+        summary = `Strong legitimacy indicator: You have ${mutualConnectionsCheck.connectionType?.toLowerCase()} at this company. Jobs through personal networks are typically genuine.`;
+      }
+    } else {
+      // Standard thresholds for unknown companies without connections
+      isGhostJob = scorePercentage < 60;
+      if (scorePercentage >= 75) {
+        summary = 'This appears to be a legitimate job posting with comprehensive details and professional presentation.';
+      } else if (scorePercentage >= 60) {
+        summary = 'This job posting shows mixed signals. While it has some good elements, there are areas of concern that warrant caution.';
+      } else {
+        summary = 'This job posting shows several red flags and characteristics commonly associated with ghost jobs or low-quality postings.';
+      }
     }
 
-    if (hasShortlistedClause) {
-      ghostIndicators.push({
-        factor: 'Overly vague job responsibilities',
-        severity: 'high' as const,
-        confidence: 85,
-        description: 'Responsibilities are too generic and not measurable'
-      });
+    const recommendations: string[] = [];
+    
+    if (mutualConnectionsCheck.hasMutuals) {
+      recommendations.push(`🤝 Leverage your ${mutualConnectionsCheck.connectionType?.toLowerCase()}: Reach out to your connection for insider insights about the role and company culture`);
     }
-
-    if (text.split(/\s+/).length > 10) {
-      ghostIndicators.push({
-        factor: 'Posted over 10 days with no updates',
-        severity: 'medium' as const,
-        confidence: 75,
-        description: 'Job posted over 10 days ago with no updates or urgency'
-      });
+    
+    if (trustedCompanyCheck.isTrusted) {
+      recommendations.push(`✅ Verified company: ${trustedCompanyCheck.companyName} is a well-established, reputable organization`);
+    } else {
+      recommendations.push('🔍 Research the company thoroughly - check their website, LinkedIn, and recent news');
     }
-
-    if (hasGenericEmail) {
-      ghostIndicators.push({
-        factor: 'No application deadline or process explained',
-        severity: 'high' as const,
-        confidence: 85,
-        description: 'No clear application deadline or interview process mentioned'
-      });
+    
+    if (!mutualConnectionsCheck.hasMutuals) {
+      recommendations.push('🌐 Try to find mutual connections on LinkedIn who work at this company for additional validation');
     }
-
-    // Positive indicators (even for ghost jobs, some things might be good)
-    if (/power bi|tableau|sql|excel/i.test(text)) {
-      positiveIndicators.push({
-        factor: 'Specific technical skills mentioned',
-        severity: 'high' as const,
-        confidence: 80,
-        description: 'Mentions specific programming languages and ML frameworks'
-      });
+    
+    if (!hasSalary) {
+      recommendations.push('💰 Ask about salary range during initial conversations');
     }
-
-    if (/bachelor|degree|experience/i.test(text)) {
-      positiveIndicators.push({
-        factor: 'Educational requirements specified',
-        severity: 'medium' as const,
-        confidence: 75,
-        description: 'Clear educational background requirements mentioned'
-      });
+    
+    if (!hasEmail && !hasPhone) {
+      recommendations.push('📞 Request direct contact information from the hiring manager');
     }
-
-    if (/collaborate|team|cross-functional/i.test(text)) {
-      positiveIndicators.push({
-        factor: 'Team collaboration mentioned',
-        severity: 'medium' as const,
-        confidence: 70,
-        description: 'Mentions working with team members and collaboration'
-      });
+    
+    if (urgentLanguage) {
+      recommendations.push('⚠️ Be cautious of jobs with excessive urgency - legitimate roles usually have proper hiring timelines');
     }
-
-    if (/consulting|client/i.test(text)) {
-      positiveIndicators.push({
-        factor: 'Professional development opportunities',
-        severity: 'low' as const,
-        confidence: 65,
-        description: 'Mentions learning and growth opportunities'
-      });
-    }
-
-    if (/full-time|hybrid|remote/i.test(text)) {
-      positiveIndicators.push({
-        factor: 'Specific work type mentioned',
-        severity: 'low' as const,
-        confidence: 60,
-        description: 'Specifies employment type and work arrangement'
-      });
-    }
+    
+    recommendations.push('📋 Prepare specific questions about day-to-day responsibilities and team structure');
+    recommendations.push('🎯 Tailor your application to address the specific requirements mentioned');
 
     return {
       isGhostJob,
-      confidence: isGhostJob ? 87 : 92,
-      company: isVeritasInsight ? 'Not specified' : 'Google Inc.',
-      role: isVeritasInsight ? 'Business Intelligence Analyst' : 'Software Engineer',
-      salary: hasCompetitiveSalary ? 'Not specified' : '$120,000 - $160,000',
-      models: [
-        {
-          name: 'BERT Transformer',
-          result: isGhostJob ? 'Ghost Job' : 'Legitimate Job',
-          confidence: isGhostJob ? 94.5 : 94.5,
-          features: ['Text semantics', 'Language patterns']
-        },
-        {
-          name: 'XGBoost Classifier',
-          result: isGhostJob ? 'Ghost Job' : 'Legitimate Job',
-          confidence: isGhostJob ? 83.4 : 83.4,
-          features: ['Feature engineering', 'Gradient boosting']
-        },
-        {
-          name: 'Random Forest',
-          result: isGhostJob ? 'Ghost Job' : 'Legitimate Job',
-          confidence: isGhostJob ? 79.6 : 79.6,
-          features: ['Decision trees', 'Feature importance']
-        },
-        {
-          name: 'Neural Network',
-          result: isGhostJob ? 'Ghost Job' : 'Legitimate Job',
-          confidence: isGhostJob ? 94.3 : 94.3,
-          features: ['Deep learning', 'Pattern recognition']
-        }
-      ],
-      ghostIndicators,
-      positiveIndicators
+      confidence: Math.round(confidence),
+      factors,
+      summary,
+      recommendations
     };
   };
 
@@ -254,330 +520,184 @@ Note: I was referred to this position by my former colleague, Mike Chen, who cur
 
     setIsAnalyzing(true);
     
-    // Simulate AI processing steps
-    const steps = [
-      'BERT Analysis',
-      'XGBoost Processing', 
-      'Random Forest',
-      'Neural Network'
-    ];
-
-    for (let i = 0; i < steps.length; i++) {
-      setCurrentStep(steps[i]);
-      await new Promise(resolve => setTimeout(resolve, 800));
-    }
+    // Simulate API delay for better UX
+    await new Promise(resolve => setTimeout(resolve, 2000));
     
     const result = analyzeJobPosting(jobDescription);
     setAnalysis(result);
     setIsAnalyzing(false);
-    setCurrentStep('');
   };
 
-  const handleUseSample = () => {
-    setJobDescription(sampleJobPosting);
-  };
-
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case 'high':
-        return 'bg-red-500/20 text-red-300 border-red-400/30';
-      case 'medium':
-        return 'bg-yellow-500/20 text-yellow-300 border-yellow-400/30';
-      case 'low':
-        return 'bg-blue-500/20 text-blue-300 border-blue-400/30';
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'good':
+        return <CheckCircle className="h-4 w-4 text-green-400" />;
+      case 'warning':
+        return <AlertTriangle className="h-4 w-4 text-yellow-400" />;
+      case 'bad':
+        return <AlertTriangle className="h-4 w-4 text-red-400" />;
       default:
-        return 'bg-gray-500/20 text-gray-300 border-gray-400/30';
+        return null;
+    }
+  };
+
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case 'Network & Connections':
+        return <UserCheck className="h-5 w-5" />;
+      case 'Company Verification':
+        return <Building className="h-5 w-5" />;
+      case 'Job Description Quality':
+        return <FileText className="h-5 w-5" />;
+      case 'Contact & Application':
+        return <Mail className="h-5 w-5" />;
+      case 'Compensation & Benefits':
+        return <DollarSign className="h-5 w-5" />;
+      case 'Red Flags Assessment':
+        return <Shield className="h-5 w-5" />;
+      default:
+        return <Brain className="h-5 w-5" />;
     }
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
-      {/* Enhanced Header */}
-      <div className="text-center space-y-6">
-        <div className="flex items-center justify-center space-x-4">
-          <div className="relative">
-            <div className="p-4 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl shadow-lg">
-              <Brain className="h-10 w-10 text-white" />
-            </div>
-            <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full flex items-center justify-center">
-              <Sparkles className="h-3 w-3 text-white" />
-            </div>
-          </div>
-          <h1 className="text-5xl font-bold text-white">AI-Powered Job Analyzer</h1>
-        </div>
-        
-        <div className="flex items-center justify-center space-x-8 text-gray-300">
-          <div className="flex items-center space-x-2">
-            <Shield className="h-5 w-5 text-green-400" />
-            <span className="font-medium">Enhanced Ghost Detection</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <BarChart3 className="h-5 w-5 text-blue-400" />
-            <span className="font-medium">4 ML Models</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Sparkles className="h-5 w-5 text-purple-400" />
-            <span className="font-medium">Grammar Analysis</span>
-          </div>
-        </div>
-        
-        <p className="text-xl text-gray-300 max-w-4xl mx-auto">
-          Advanced machine learning analysis with enhanced ghost job detection, grammar checking, and salary verification
-        </p>
-      </div>
-
+    <div className="max-w-4xl mx-auto space-y-8">
       {/* Input Section */}
-      <div className="bg-gradient-to-br from-purple-900/20 to-blue-900/20 backdrop-blur-xl border border-purple-500/30 rounded-2xl shadow-2xl p-8">
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <FileText className="h-6 w-6 text-purple-400" />
-              <label className="text-xl font-semibold text-white">
-                Job Description Analysis
-              </label>
-            </div>
-            <button
-              onClick={handleUseSample}
-              className="px-4 py-2 bg-purple-600/20 backdrop-blur-xl border border-purple-400/30 text-purple-300 text-sm font-medium rounded-lg hover:bg-purple-600/30 hover:border-purple-400/50 transform hover:scale-105 transition-all duration-300 flex items-center space-x-2 shadow-lg"
-            >
-              <Eye className="h-4 w-4" />
-              <span>Use Sample Job</span>
-            </button>
+      <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 shadow-2xl">
+        <div className="flex items-center space-x-3 mb-6">
+          <div className="p-2 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl">
+            <Brain className="h-6 w-6 text-white" />
           </div>
-          
+          <h2 className="text-2xl font-bold text-white">AI Job Analysis</h2>
+          <div className="px-3 py-1 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 rounded-full">
+            <span className="text-green-300 text-sm font-medium">100+ Detection Factors</span>
+          </div>
+        </div>
+        
+        <div className="space-y-4">
+          <label className="block text-sm font-medium text-gray-300">
+            Paste the job description below:
+          </label>
           <textarea
             value={jobDescription}
             onChange={(e) => setJobDescription(e.target.value)}
-            placeholder="Paste the complete job posting here..."
-            className="w-full h-64 px-6 py-4 bg-gray-900/50 backdrop-blur-sm border border-gray-600/30 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-400/50 resize-none text-sm leading-relaxed shadow-inner"
+            placeholder="Paste the complete job posting here, including company name, job title, requirements, responsibilities, and any other details...
+
+💡 Pro tip: If you have mutual connections at the company or were referred by someone, mention that in the description for more accurate analysis!"
+            className="w-full h-64 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none backdrop-blur-sm"
           />
-          
-          <div className="flex items-center justify-between text-sm text-gray-400">
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-1">
-                <BarChart3 className="h-4 w-4" />
-                <span>{jobDescription.length} characters</span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <FileText className="h-4 w-4" />
-                <span>{jobDescription.split(/\s+/).filter(word => word.length > 0).length} words</span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <Clock className="h-4 w-4" />
-                <span>{Math.ceil(jobDescription.split(/\s+/).filter(word => word.length > 0).length / 200)} min read</span>
-              </div>
-            </div>
-            <span className="text-gray-500">Minimum 200 characters recommended</span>
-          </div>
           
           <button
             onClick={handleAnalyze}
             disabled={!jobDescription.trim() || isAnalyzing}
-            className="w-full py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold text-lg rounded-xl hover:from-purple-700 hover:to-blue-700 hover:shadow-lg hover:shadow-purple-500/25 transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-3 shadow-lg"
+            className="w-full py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-purple-500/25 transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2"
           >
             {isAnalyzing ? (
               <>
-                <div className="relative">
-                  <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
-                </div>
-                <span>Analyzing...</span>
+                <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                <span>Analyzing with AI...</span>
               </>
             ) : (
               <>
-                <Brain className="h-6 w-6" />
+                <Brain className="h-5 w-5" />
                 <span>Analyze Job Posting</span>
-                <Sparkles className="h-5 w-5" />
               </>
             )}
           </button>
         </div>
       </div>
 
-      {/* Loading Animation */}
-      {isAnalyzing && (
-        <div className="bg-gray-900/50 backdrop-blur-xl border border-gray-600/30 rounded-2xl shadow-2xl p-12">
-          <div className="text-center space-y-8">
-            <div className="flex justify-center">
-              <div className="relative">
-                <div className="w-24 h-24 border-4 border-purple-600/30 rounded-full"></div>
-                <div className="absolute inset-0 w-24 h-24 border-4 border-transparent border-t-purple-400 rounded-full animate-spin"></div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Brain className="h-10 w-10 text-purple-400 animate-pulse" />
-                </div>
+      {/* Results Section */}
+      {analysis && (
+        <div className="space-y-6">
+          {/* Overall Result */}
+          <div className={`bg-white/10 backdrop-blur-xl border rounded-2xl p-8 shadow-2xl ${
+            analysis.isGhostJob 
+              ? 'border-red-500/30 bg-red-500/5' 
+              : 'border-green-500/30 bg-green-500/5'
+          }`}>
+            <div className="flex items-start space-x-4">
+              <div className={`p-3 rounded-xl ${
+                analysis.isGhostJob 
+                  ? 'bg-red-500/20 text-red-400' 
+                  : 'bg-green-500/20 text-green-400'
+              }`}>
+                {analysis.isGhostJob ? (
+                  <AlertTriangle className="h-8 w-8" />
+                ) : (
+                  <CheckCircle className="h-8 w-8" />
+                )}
               </div>
-            </div>
-            
-            <div className="space-y-4">
-              <h3 className="text-2xl font-bold text-white">Processing with AI Models</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className={`flex items-center space-x-2 p-3 rounded-lg border ${
-                  currentStep === 'BERT Analysis' ? 'bg-purple-600/20 border-purple-400/50 text-purple-300' : 'bg-gray-800/50 border-gray-600/30 text-gray-400'
-                }`}>
-                  <Brain className="h-4 w-4" />
-                  <span className="text-sm font-medium">BERT Analysis</span>
+              
+              <div className="flex-1">
+                <div className="flex items-center space-x-3 mb-2">
+                  <h3 className={`text-2xl font-bold ${
+                    analysis.isGhostJob ? 'text-red-400' : 'text-green-400'
+                  }`}>
+                    {analysis.isGhostJob ? 'Potential Ghost Job' : 'Likely Legitimate Job'}
+                  </h3>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-gray-300 text-sm">Confidence:</span>
+                    <span className="text-white font-bold">{analysis.confidence}%</span>
+                  </div>
                 </div>
-                <div className={`flex items-center space-x-2 p-3 rounded-lg border ${
-                  currentStep === 'XGBoost Processing' ? 'bg-blue-600/20 border-blue-400/50 text-blue-300' : 'bg-gray-800/50 border-gray-600/30 text-gray-400'
-                }`}>
-                  <BarChart3 className="h-4 w-4" />
-                  <span className="text-sm font-medium">XGBoost Processing</span>
-                </div>
-                <div className={`flex items-center space-x-2 p-3 rounded-lg border ${
-                  currentStep === 'Random Forest' ? 'bg-green-600/20 border-green-400/50 text-green-300' : 'bg-gray-800/50 border-gray-600/30 text-gray-400'
-                }`}>
-                  <TrendingUp className="h-4 w-4" />
-                  <span className="text-sm font-medium">Random Forest</span>
-                </div>
-                <div className={`flex items-center space-x-2 p-3 rounded-lg border ${
-                  currentStep === 'Neural Network' ? 'bg-orange-600/20 border-orange-400/50 text-orange-300' : 'bg-gray-800/50 border-gray-600/30 text-gray-400'
-                }`}>
-                  <Activity className="h-4 w-4" />
-                  <span className="text-sm font-medium">Neural Network</span>
-                </div>
+                
+                <p className="text-gray-300 text-lg leading-relaxed mb-4">
+                  {analysis.summary}
+                </p>
               </div>
             </div>
           </div>
-        </div>
-      )}
 
-      {/* Results Section */}
-      {analysis && !isAnalyzing && (
-        <div className="space-y-8 animate-fade-in">
-          {/* Salary & Company Analysis */}
-          <div className="bg-gray-900/50 backdrop-blur-xl border border-gray-600/30 rounded-2xl shadow-2xl p-8">
+          {/* Detailed Analysis */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {analysis.factors.map((category, categoryIndex) => (
+              <div key={categoryIndex} className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 shadow-xl">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="p-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg text-white">
+                    {getCategoryIcon(category.category)}
+                  </div>
+                  <h4 className="text-lg font-semibold text-white">{category.category}</h4>
+                </div>
+                
+                <div className="space-y-3">
+                  {category.items.map((item, itemIndex) => (
+                    <div key={itemIndex} className="flex items-start space-x-3 p-3 bg-white/5 rounded-lg border border-white/10">
+                      {getStatusIcon(item.status)}
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="font-medium text-white text-sm">{item.factor}</span>
+                          <span className="text-xs text-gray-400">Weight: {item.weight}</span>
+                        </div>
+                        <p className="text-gray-300 text-xs">{item.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Recommendations */}
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 shadow-xl">
             <div className="flex items-center space-x-3 mb-6">
-              <DollarSign className="h-6 w-6 text-green-400" />
-              <h2 className="text-2xl font-bold text-white">Salary & Company Analysis</h2>
+              <div className="p-2 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl text-white">
+                <Star className="h-6 w-6" />
+              </div>
+              <h3 className="text-xl font-bold text-white">Recommendations</h3>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-              <div>
-                <div className="text-gray-400 mb-2">Company:</div>
-                <div className="text-xl font-bold text-white">{analysis.company}</div>
-              </div>
-              <div>
-                <div className="text-gray-400 mb-2">Role:</div>
-                <div className="text-xl font-bold text-white">{analysis.role}</div>
-              </div>
-              <div>
-                <div className="text-gray-400 mb-2">Salary:</div>
-                <div className="text-xl font-bold text-white">{analysis.salary}</div>
-              </div>
-            </div>
-
-            {/* AI Models Results */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {analysis.models.map((model, index) => (
-                <div key={index} className="bg-gray-800/50 backdrop-blur-sm border border-gray-600/30 rounded-xl p-6 hover:bg-gray-800/70 transition-all duration-300">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-bold text-white">{model.name}</h3>
-                    <Brain className="h-5 w-5 text-purple-400" />
-                  </div>
-                  
-                  <div className={`text-lg font-bold mb-2 ${
-                    model.result === 'Legitimate Job' ? 'text-green-400' : 'text-red-400'
-                  }`}>
-                    {model.result}
-                  </div>
-                  
-                  <div className="text-gray-300 mb-4">{model.confidence}% confidence</div>
-                  
-                  <div className="space-y-2">
-                    {model.features.map((feature, featureIndex) => (
-                      <div key={featureIndex} className="px-2 py-1 bg-gray-700/50 rounded text-xs text-gray-300">
-                        {feature}
-                      </div>
-                    ))}
-                  </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {analysis.recommendations.map((recommendation, index) => (
+                <div key={index} className="flex items-start space-x-3 p-4 bg-white/5 rounded-lg border border-white/10">
+                  <div className="text-lg">{recommendation.split(' ')[0]}</div>
+                  <p className="text-gray-300 text-sm">{recommendation.substring(recommendation.indexOf(' ') + 1)}</p>
                 </div>
               ))}
             </div>
           </div>
-
-          {/* Indicators Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Ghost Job Indicators */}
-            <div className="bg-gray-900/50 backdrop-blur-xl border border-gray-600/30 rounded-2xl shadow-2xl p-8">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center space-x-3">
-                  <AlertTriangle className="h-6 w-6 text-red-400" />
-                  <h3 className="text-xl font-bold text-white">Ghost Job Indicators</h3>
-                  <span className="px-2 py-1 bg-red-500/20 text-red-300 rounded-full text-sm font-bold">
-                    {analysis.ghostIndicators.length}
-                  </span>
-                </div>
-                <ChevronDown className="h-5 w-5 text-gray-400" />
-              </div>
-              
-              <div className="space-y-4">
-                {analysis.ghostIndicators.map((indicator, index) => (
-                  <div key={index} className="bg-gray-800/50 backdrop-blur-sm border border-gray-600/30 rounded-lg p-4 hover:bg-gray-800/70 transition-all duration-300">
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex items-center space-x-2">
-                        <CheckCircle className="h-4 w-4 text-red-400 flex-shrink-0 mt-0.5" />
-                        <span className="font-semibold text-white text-sm">{indicator.factor}</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <span className={`px-2 py-1 rounded text-xs font-bold border ${getSeverityColor(indicator.severity)}`}>
-                          {indicator.severity}
-                        </span>
-                        <span className="text-xs text-gray-400">{indicator.confidence}%</span>
-                        <Info className="h-4 w-4 text-gray-400" />
-                      </div>
-                    </div>
-                    <p className="text-gray-300 text-sm">{indicator.description}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Positive Indicators */}
-            <div className="bg-gray-900/50 backdrop-blur-xl border border-gray-600/30 rounded-2xl shadow-2xl p-8">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="h-6 w-6 text-green-400" />
-                  <h3 className="text-xl font-bold text-white">Positive Indicators</h3>
-                  <span className="px-2 py-1 bg-green-500/20 text-green-300 rounded-full text-sm font-bold">
-                    {analysis.positiveIndicators.length}
-                  </span>
-                </div>
-                <ChevronDown className="h-5 w-5 text-gray-400" />
-              </div>
-              
-              <div className="space-y-4">
-                {analysis.positiveIndicators.map((indicator, index) => (
-                  <div key={index} className="bg-gray-800/50 backdrop-blur-sm border border-gray-600/30 rounded-lg p-4 hover:bg-gray-800/70 transition-all duration-300">
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex items-center space-x-2">
-                        <AlertCircle className="h-4 w-4 text-green-400 flex-shrink-0 mt-0.5" />
-                        <span className="font-semibold text-white text-sm">{indicator.factor}</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <span className={`px-2 py-1 rounded text-xs font-bold border ${getSeverityColor(indicator.severity)}`}>
-                          {indicator.severity}
-                        </span>
-                        <span className="text-xs text-gray-400">{indicator.confidence}%</span>
-                        <Info className="h-4 w-4 text-gray-400" />
-                      </div>
-                    </div>
-                    <p className="text-gray-300 text-sm">{indicator.description}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
         </div>
       )}
-
-      <style jsx>{`
-        @keyframes fade-in {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in {
-          animation: fade-in 0.6s ease-out;
-        }
-      `}</style>
     </div>
   );
 };
