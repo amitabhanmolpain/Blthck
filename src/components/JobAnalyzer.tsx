@@ -27,7 +27,8 @@ import {
   ExternalLink,
   AlertCircle,
   Info,
-  UserCheck
+  UserCheck,
+  HelpCircle
 } from 'lucide-react';
 
 interface MLAnalysisResult {
@@ -55,6 +56,8 @@ interface ConditionResult {
   impact: 'high' | 'medium' | 'low';
   category: string;
   description: string;
+  whyGhostJob?: string;
+  whyLegitimate?: string;
 }
 
 interface ModelResult {
@@ -97,6 +100,7 @@ const JobAnalyzer: React.FC = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<MLAnalysisResult | null>(null);
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
+  const [hoveredCondition, setHoveredCondition] = useState<string | null>(null);
 
   const toggleSection = (section: string) => {
     const newExpanded = new Set(expandedSections);
@@ -135,7 +139,9 @@ const JobAnalyzer: React.FC = () => {
         confidence: 85,
         impact: 'high',
         category: 'Content Quality',
-        description: 'Job description lacks specific details about role and responsibilities'
+        description: 'Job description lacks specific details about role and responsibilities',
+        whyGhostJob: 'Legitimate employers provide detailed job descriptions to attract qualified candidates. Vague descriptions are often used to cast a wide net for data collection or to avoid scrutiny of fake positions.',
+        whyLegitimate: 'Detailed descriptions show the employer has thought through the role requirements and is serious about finding the right candidate.'
       },
       {
         condition: "No clear job location",
@@ -143,7 +149,9 @@ const JobAnalyzer: React.FC = () => {
         confidence: 78,
         impact: 'medium',
         category: 'Location',
-        description: 'No specific work location or arrangement mentioned'
+        description: 'No specific work location or arrangement mentioned',
+        whyGhostJob: 'Real jobs always specify where work will be performed. Omitting location details is a red flag that the position may not exist or the poster wants to avoid geographic limitations.',
+        whyLegitimate: 'Clear location information helps candidates make informed decisions and shows transparency from the employer.'
       },
       {
         condition: "Urgent language indicators",
@@ -151,7 +159,9 @@ const JobAnalyzer: React.FC = () => {
         confidence: 72,
         impact: 'medium',
         category: 'Language Analysis',
-        description: 'Uses urgent language which is common in ghost jobs'
+        description: 'Uses urgent language which is common in ghost jobs',
+        whyGhostJob: 'Artificial urgency is used to pressure candidates into quick decisions without proper research. Legitimate hiring processes take time for proper evaluation.',
+        whyLegitimate: 'Professional hiring processes allow adequate time for both parties to evaluate fit and make informed decisions.'
       },
       {
         condition: "No contact information",
@@ -159,7 +169,9 @@ const JobAnalyzer: React.FC = () => {
         confidence: 88,
         impact: 'high',
         category: 'Contact Info',
-        description: 'No contact person or method provided'
+        description: 'No contact person or method provided',
+        whyGhostJob: 'Legitimate employers provide clear contact information for candidates to ask questions. Absence of contact details suggests the poster wants to avoid direct communication or verification.',
+        whyLegitimate: 'Real employers want qualified candidates to reach out and provide multiple ways to get in touch.'
       },
       {
         condition: "Vague salary information",
@@ -167,7 +179,9 @@ const JobAnalyzer: React.FC = () => {
         confidence: 65,
         impact: 'medium',
         category: 'Compensation',
-        description: 'Only mentions competitive salary without specific range'
+        description: 'Only mentions competitive salary without specific range',
+        whyGhostJob: 'Vague salary terms like "competitive" without specifics are used to avoid commitment. Real employers typically provide salary ranges to attract serious candidates.',
+        whyLegitimate: 'Transparent salary information shows the employer respects candidates\' time and has a real budget allocated for the position.'
       },
       {
         condition: "Too many buzzwords",
@@ -175,7 +189,9 @@ const JobAnalyzer: React.FC = () => {
         confidence: 70,
         impact: 'medium',
         category: 'Language Analysis',
-        description: 'Excessive use of buzzwords without substance'
+        description: 'Excessive use of buzzwords without substance',
+        whyGhostJob: 'Overuse of buzzwords often masks lack of real substance or specific requirements. It\'s a common tactic to make fake jobs sound appealing without providing concrete details.',
+        whyLegitimate: 'Professional job descriptions focus on specific skills, responsibilities, and qualifications rather than trendy buzzwords.'
       },
       {
         condition: "No specific requirements",
@@ -183,7 +199,9 @@ const JobAnalyzer: React.FC = () => {
         confidence: 82,
         impact: 'high',
         category: 'Requirements',
-        description: 'No clear qualifications or requirements specified'
+        description: 'No clear qualifications or requirements specified',
+        whyGhostJob: 'Real positions have specific requirements to help filter candidates. Absence of requirements suggests the poster isn\'t actually planning to hire or evaluate candidates.',
+        whyLegitimate: 'Clear requirements help both employer and candidate determine if there\'s a good fit, showing serious hiring intent.'
       },
       {
         condition: "Generic role title",
@@ -191,7 +209,9 @@ const JobAnalyzer: React.FC = () => {
         confidence: 45,
         impact: 'low',
         category: 'Title Analysis',
-        description: 'Uses generic job titles that could apply to many roles'
+        description: 'Uses generic job titles that could apply to many roles',
+        whyGhostJob: 'Generic titles are often used in fake postings to cast a wide net and collect resumes from various backgrounds without committing to specific role requirements.',
+        whyLegitimate: 'Specific job titles indicate the employer has clearly defined the role and its place within the organization.'
       },
       {
         condition: "No company information",
@@ -199,7 +219,9 @@ const JobAnalyzer: React.FC = () => {
         confidence: 75,
         impact: 'medium',
         category: 'Company Info',
-        description: 'No information about the company or its mission'
+        description: 'No information about the company or its mission',
+        whyGhostJob: 'Legitimate companies want to attract candidates by showcasing their culture and mission. Absence of company information suggests the posting may be fake or from an unestablished entity.',
+        whyLegitimate: 'Company information helps candidates understand the work environment and shows the employer is proud of their organization and wants to attract cultural fits.'
       },
       {
         condition: "Unrealistic promises",
@@ -207,7 +229,9 @@ const JobAnalyzer: React.FC = () => {
         confidence: 90,
         impact: 'high',
         category: 'Promises',
-        description: 'Makes unrealistic promises about compensation or flexibility'
+        description: 'Makes unrealistic promises about compensation or flexibility',
+        whyGhostJob: 'Unrealistic promises are classic signs of scams or fake jobs designed to lure in desperate job seekers. Real employers set realistic expectations.',
+        whyLegitimate: 'Honest job descriptions set realistic expectations about compensation, work arrangements, and requirements.'
       }
     ];
 
@@ -218,7 +242,9 @@ const JobAnalyzer: React.FC = () => {
         confidence: 95,
         impact: 'high',
         category: 'Network Verification',
-        description: 'Mentions mutual connections or referrals - strong legitimacy indicator'
+        description: 'Mentions mutual connections or referrals - strong legitimacy indicator',
+        whyLegitimate: 'Jobs through personal networks are typically genuine because real people stake their reputation on the referral. Companies with existing employees are more likely to be legitimate.',
+        whyGhostJob: 'Fake job posters rarely have real employee networks to reference, making mutual connections a strong authenticity signal.'
       },
       {
         condition: "Detailed job description",
@@ -226,7 +252,9 @@ const JobAnalyzer: React.FC = () => {
         confidence: 85,
         impact: 'high',
         category: 'Content Quality',
-        description: 'Comprehensive description with good detail'
+        description: 'Comprehensive description with good detail',
+        whyLegitimate: 'Detailed descriptions show the employer has invested time in defining the role and is serious about finding the right candidate. This level of detail requires genuine planning.',
+        whyGhostJob: 'Fake job posters typically use brief, generic descriptions to minimize effort and avoid specific commitments they can\'t fulfill.'
       },
       {
         condition: "Clear responsibilities listed",
@@ -234,7 +262,9 @@ const JobAnalyzer: React.FC = () => {
         confidence: 80,
         impact: 'high',
         category: 'Role Clarity',
-        description: 'Specific responsibilities and duties outlined'
+        description: 'Specific responsibilities and duties outlined',
+        whyLegitimate: 'Clear responsibilities indicate the employer has thought through what the role entails and can provide meaningful work. This shows genuine business needs.',
+        whyGhostJob: 'Vague or missing responsibilities suggest the poster hasn\'t actually planned what the employee would do, indicating a fake position.'
       },
       {
         condition: "Specific qualifications",
@@ -242,7 +272,9 @@ const JobAnalyzer: React.FC = () => {
         confidence: 75,
         impact: 'medium',
         category: 'Requirements',
-        description: 'Clear educational and experience requirements'
+        description: 'Clear educational and experience requirements',
+        whyLegitimate: 'Specific qualifications show the employer knows what skills are needed for success and has standards for hiring. This indicates a real role with defined expectations.',
+        whyGhostJob: 'Fake jobs often avoid specific requirements to cast a wider net for data collection or to avoid having to justify their criteria.'
       },
       {
         condition: "Benefits mentioned",
@@ -250,7 +282,9 @@ const JobAnalyzer: React.FC = () => {
         confidence: 70,
         impact: 'medium',
         category: 'Benefits',
-        description: 'Specific benefits and compensation details provided'
+        description: 'Specific benefits and compensation details provided',
+        whyLegitimate: 'Detailed benefits information shows the company has established HR policies and is prepared to invest in employees. This requires real infrastructure.',
+        whyGhostJob: 'Fake employers typically avoid specific benefit details since they don\'t actually have the systems or budget to provide them.'
       },
       {
         condition: "Team information",
@@ -258,7 +292,9 @@ const JobAnalyzer: React.FC = () => {
         confidence: 68,
         impact: 'medium',
         category: 'Team Structure',
-        description: 'Information about team structure and reporting'
+        description: 'Information about team structure and reporting',
+        whyLegitimate: 'Team and reporting structure details indicate an established organization with real people and departments. This shows the role fits into an existing structure.',
+        whyGhostJob: 'Fake jobs rarely mention specific teams or reporting structures since these don\'t exist in non-existent organizations.'
       },
       {
         condition: "Technical skills specified",
@@ -266,7 +302,9 @@ const JobAnalyzer: React.FC = () => {
         confidence: 72,
         impact: 'medium',
         category: 'Technical Requirements',
-        description: 'Specific technical skills and tools mentioned'
+        description: 'Specific technical skills and tools mentioned',
+        whyLegitimate: 'Specific technical requirements show the employer understands the role\'s needs and has real projects requiring these skills. This indicates genuine technical work.',
+        whyGhostJob: 'Generic or missing technical requirements suggest the poster doesn\'t actually understand the role or have real technical work to be done.'
       },
       {
         condition: "Company mission mentioned",
@@ -274,7 +312,9 @@ const JobAnalyzer: React.FC = () => {
         confidence: 65,
         impact: 'low',
         category: 'Company Culture',
-        description: 'Company culture and mission information provided'
+        description: 'Company culture and mission information provided',
+        whyLegitimate: 'Mission and culture information shows an established company with defined values and long-term vision. This indicates stability and genuine business operations.',
+        whyGhostJob: 'Fake companies typically lack the depth to articulate genuine mission and culture, focusing instead on generic appeals.'
       },
       {
         condition: "Growth opportunities",
@@ -282,7 +322,9 @@ const JobAnalyzer: React.FC = () => {
         confidence: 60,
         impact: 'low',
         category: 'Career Development',
-        description: 'Mentions career growth and development opportunities'
+        description: 'Mentions career growth and development opportunities',
+        whyLegitimate: 'Growth opportunities indicate a company that invests in employee development and has career paths planned. This shows long-term thinking and employee retention focus.',
+        whyGhostJob: 'Fake employers don\'t typically offer genuine development opportunities since they don\'t have the infrastructure or intention to support employee growth.'
       },
       {
         condition: "Interview process described",
@@ -290,7 +332,9 @@ const JobAnalyzer: React.FC = () => {
         confidence: 78,
         impact: 'medium',
         category: 'Process Transparency',
-        description: 'Clear information about the hiring process'
+        description: 'Clear information about the hiring process',
+        whyLegitimate: 'Transparent hiring process information shows the employer has established procedures and is committed to fair evaluation. This indicates professional HR practices.',
+        whyGhostJob: 'Fake job posters typically avoid detailing interview processes since they don\'t intend to actually conduct legitimate interviews or hiring.'
       },
       {
         condition: "Realistic timeline",
@@ -298,7 +342,9 @@ const JobAnalyzer: React.FC = () => {
         confidence: 55,
         impact: 'low',
         category: 'Timeline',
-        description: 'Realistic timeline and start date information'
+        description: 'Realistic timeline and start date information',
+        whyLegitimate: 'Specific timelines show the employer has planned when they need someone to start and has coordinated with business needs. This indicates real planning.',
+        whyGhostJob: 'Fake jobs often lack specific timelines since there\'s no real business need driving the hiring timeline.'
       }
     ];
 
@@ -668,11 +714,13 @@ const JobAnalyzer: React.FC = () => {
                     {result.ghostConditions.slice(0, expandedSections.has('ghost-conditions') ? undefined : 5).map((condition, index) => (
                       <div
                         key={index}
-                        className={`p-4 rounded-xl border transition-all duration-300 ${
+                        className={`relative p-4 rounded-xl border transition-all duration-300 ${
                           condition.detected 
                             ? 'bg-red-500/10 border-red-500/20 hover:bg-red-500/20 shadow-md' 
                             : 'bg-black/5 border-white/10 hover:bg-black/15'
                         }`}
+                        onMouseEnter={() => setHoveredCondition(`ghost-${index}`)}
+                        onMouseLeave={() => setHoveredCondition(null)}
                       >
                         <div className="flex items-start justify-between mb-2">
                           <div className="flex items-center space-x-2">
@@ -684,6 +732,7 @@ const JobAnalyzer: React.FC = () => {
                             <span className={`font-semibold ${condition.detected ? 'text-red-300' : 'text-green-300'}`}>
                               {condition.condition}
                             </span>
+                            <HelpCircle className="h-4 w-4 text-white/40 hover:text-white/60 transition-colors" />
                           </div>
                           <div className="flex items-center space-x-2">
                             <span className={`text-xs font-medium px-2 py-1 rounded ${
@@ -697,6 +746,21 @@ const JobAnalyzer: React.FC = () => {
                           </div>
                         </div>
                         <p className="text-sm text-white/70">{condition.description}</p>
+
+                        {/* Hover Tooltip */}
+                        {hoveredCondition === `ghost-${index}` && (
+                          <div className="absolute z-50 bottom-full left-0 right-0 mb-2 p-4 bg-black/90 backdrop-blur-xl border border-white/20 rounded-xl shadow-2xl">
+                            <div className="text-sm">
+                              <div className="font-semibold text-red-300 mb-2 flex items-center">
+                                <AlertTriangle className="h-4 w-4 mr-2" />
+                                Why this indicates a Ghost Job:
+                              </div>
+                              <p className="text-white/80 leading-relaxed">
+                                {condition.whyGhostJob}
+                              </p>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))}
                     
@@ -734,11 +798,13 @@ const JobAnalyzer: React.FC = () => {
                     {result.legitimateConditions.slice(0, expandedSections.has('legitimate-conditions') ? undefined : 5).map((condition, index) => (
                       <div
                         key={index}
-                        className={`p-4 rounded-xl border transition-all duration-300 ${
+                        className={`relative p-4 rounded-xl border transition-all duration-300 ${
                           condition.detected 
                             ? 'bg-green-500/10 border-green-500/20 hover:bg-green-500/20 shadow-md' 
                             : 'bg-black/5 border-white/10 hover:bg-black/15'
                         }`}
+                        onMouseEnter={() => setHoveredCondition(`legitimate-${index}`)}
+                        onMouseLeave={() => setHoveredCondition(null)}
                       >
                         <div className="flex items-start justify-between mb-2">
                           <div className="flex items-center space-x-2">
@@ -750,6 +816,7 @@ const JobAnalyzer: React.FC = () => {
                             <span className={`font-semibold ${condition.detected ? 'text-green-300' : 'text-red-300'}`}>
                               {condition.condition}
                             </span>
+                            <HelpCircle className="h-4 w-4 text-white/40 hover:text-white/60 transition-colors" />
                           </div>
                           <div className="flex items-center space-x-2">
                             <span className={`text-xs font-medium px-2 py-1 rounded ${
@@ -763,6 +830,21 @@ const JobAnalyzer: React.FC = () => {
                           </div>
                         </div>
                         <p className="text-sm text-white/70">{condition.description}</p>
+
+                        {/* Hover Tooltip */}
+                        {hoveredCondition === `legitimate-${index}` && (
+                          <div className="absolute z-50 bottom-full left-0 right-0 mb-2 p-4 bg-black/90 backdrop-blur-xl border border-white/20 rounded-xl shadow-2xl">
+                            <div className="text-sm">
+                              <div className="font-semibold text-green-300 mb-2 flex items-center">
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Why this indicates a Legitimate Job:
+                              </div>
+                              <p className="text-white/80 leading-relaxed">
+                                {condition.whyLegitimate}
+                              </p>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))}
                     
