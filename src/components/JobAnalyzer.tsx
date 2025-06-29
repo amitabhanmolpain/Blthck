@@ -14,7 +14,10 @@ import {
   Star,
   Award,
   Verified,
-  UserCheck
+  UserCheck,
+  Sparkles,
+  Zap,
+  Target
 } from 'lucide-react';
 
 interface AnalysisResult {
@@ -37,76 +40,6 @@ const JobAnalyzer: React.FC = () => {
   const [jobDescription, setJobDescription] = useState('');
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-
-  // Comprehensive list of trusted companies
-  const trustedCompanies = [
-    // Indian IT Giants
-    'TCS', 'Tata Consultancy Services', 'Infosys', 'Wipro', 'HCL Technologies', 'HCL Tech', 'Tech Mahindra',
-    'Cognizant', 'Mindtree', 'LTI', 'L&T Infotech', 'Mphasis', 'Hexaware', 'Persistent Systems',
-    
-    // Global Tech Giants
-    'Google', 'Microsoft', 'Apple', 'Amazon', 'Meta', 'Facebook', 'Netflix', 'Tesla', 'Uber', 'Airbnb',
-    'Salesforce', 'Oracle', 'SAP', 'Adobe', 'Intel', 'NVIDIA', 'AMD', 'Qualcomm', 'Cisco', 'VMware',
-    'ServiceNow', 'Snowflake', 'Palantir', 'Databricks', 'Stripe', 'Square', 'PayPal', 'eBay',
-    
-    // Consulting & Professional Services
-    'McKinsey', 'BCG', 'Boston Consulting Group', 'Bain', 'Deloitte', 'PwC', 'EY', 'KPMG', 'Accenture',
-    'IBM', 'Capgemini', 'Atos', 'DXC Technology', 'NTT Data', 'Fujitsu',
-    
-    // Financial Services
-    'JPMorgan Chase', 'Goldman Sachs', 'Morgan Stanley', 'Bank of America', 'Wells Fargo', 'Citigroup',
-    'American Express', 'Visa', 'Mastercard', 'BlackRock', 'Fidelity', 'Charles Schwab',
-    
-    // E-commerce & Retail
-    'Walmart', 'Target', 'Home Depot', 'Costco', 'Best Buy', 'Shopify', 'Etsy', 'Wayfair',
-    
-    // Healthcare & Pharma
-    'Johnson & Johnson', 'Pfizer', 'Merck', 'Abbott', 'Medtronic', 'UnitedHealth', 'Anthem',
-    
-    // Automotive
-    'Ford', 'General Motors', 'Toyota', 'Honda', 'BMW', 'Mercedes-Benz', 'Volkswagen', 'Nissan',
-    
-    // Aerospace & Defense
-    'Boeing', 'Lockheed Martin', 'Raytheon', 'Northrop Grumman', 'General Dynamics',
-    
-    // Media & Entertainment
-    'Disney', 'Warner Bros', 'Sony', 'Universal', 'Paramount', 'Fox', 'CBS', 'NBC',
-    
-    // Telecommunications
-    'Verizon', 'AT&T', 'T-Mobile', 'Sprint', 'Comcast', 'Charter Communications',
-    
-    // Energy & Utilities
-    'ExxonMobil', 'Chevron', 'Shell', 'BP', 'ConocoPhillips', 'General Electric', 'Siemens',
-    
-    // Indian Conglomerates
-    'Reliance', 'Tata Group', 'Aditya Birla Group', 'Mahindra Group', 'Bajaj Group', 'Godrej',
-    'ITC', 'Larsen & Toubro', 'HDFC', 'ICICI', 'SBI', 'Axis Bank',
-    
-    // Startups & Unicorns (well-established)
-    'Spotify', 'Slack', 'Zoom', 'Dropbox', 'Box', 'Atlassian', 'Twilio', 'MongoDB', 'Elastic',
-    'Okta', 'CrowdStrike', 'Zscaler', 'Palo Alto Networks', 'Fortinet',
-    
-    // Indian Startups & Companies
-    'Flipkart', 'Paytm', 'Zomato', 'Swiggy', 'Ola', 'Byju\'s', 'Unacademy', 'PhonePe', 'Razorpay',
-    'Freshworks', 'Zoho', 'InMobi', 'Mu Sigma', 'Fractal Analytics'
-  ];
-
-  const checkTrustedCompany = (text: string): { isTrusted: boolean; companyName: string | null } => {
-    const normalizedText = text.toLowerCase();
-    
-    for (const company of trustedCompanies) {
-      const normalizedCompany = company.toLowerCase();
-      
-      // Check for exact matches or company name within word boundaries
-      const regex = new RegExp(`\\b${normalizedCompany.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
-      
-      if (regex.test(normalizedText)) {
-        return { isTrusted: true, companyName: company };
-      }
-    }
-    
-    return { isTrusted: false, companyName: null };
-  };
 
   const checkMutualConnections = (text: string): { hasMutuals: boolean; connectionType: string | null } => {
     const normalizedText = text.toLowerCase();
@@ -183,9 +116,6 @@ const JobAnalyzer: React.FC = () => {
     let totalScore = 0;
     let maxScore = 0;
 
-    // Check for trusted company first
-    const trustedCompanyCheck = checkTrustedCompany(text);
-    
     // Check for mutual connections
     const mutualConnectionsCheck = checkMutualConnections(text);
     
@@ -218,38 +148,28 @@ const JobAnalyzer: React.FC = () => {
     // Company Analysis
     const companyFactors = [];
     
-    if (trustedCompanyCheck.isTrusted) {
+    // Check for company information
+    const hasCompanyInfo = /company|organization|firm|corp|inc|ltd|llc/i.test(text);
+    if (hasCompanyInfo) {
       companyFactors.push({
-        factor: 'Trusted Company',
+        factor: 'Company Information',
         status: 'good' as const,
-        description: `Posted by ${trustedCompanyCheck.companyName}, a well-established and reputable company`,
-        weight: 25 // High weight for trusted companies
+        description: 'Company information provided in the posting',
+        weight: 15
       });
-      totalScore += 25;
+      totalScore += 15;
     } else {
-      // Check for company information
-      const hasCompanyInfo = /company|organization|firm|corp|inc|ltd|llc/i.test(text);
-      if (hasCompanyInfo) {
-        companyFactors.push({
-          factor: 'Company Information',
-          status: 'warning' as const,
-          description: 'Company mentioned but not in our trusted companies database',
-          weight: 5
-        });
-        totalScore += 5;
-      } else {
-        companyFactors.push({
-          factor: 'Company Information',
-          status: 'bad' as const,
-          description: 'No clear company information provided',
-          weight: 0
-        });
-      }
+      companyFactors.push({
+        factor: 'Company Information',
+        status: 'bad' as const,
+        description: 'No clear company information provided',
+        weight: 0
+      });
     }
-    maxScore += 25;
+    maxScore += 15;
 
     factors.push({
-      category: 'Company Verification',
+      category: 'Company Information',
       items: companyFactors
     });
 
@@ -400,7 +320,6 @@ const JobAnalyzer: React.FC = () => {
     const redFlagFactors = [];
     const urgentLanguage = /urgent|immediate|asap|right away|start immediately/i.test(text);
     const tooGoodToBeTrueLanguage = /easy money|no experience|work from home|make money fast|guaranteed/i.test(text);
-    const vagueLanguage = /dynamic|fast-paced|exciting opportunity|join our team/i.test(text);
 
     if (!urgentLanguage) {
       redFlagFactors.push({
@@ -446,25 +365,16 @@ const JobAnalyzer: React.FC = () => {
     const scorePercentage = Math.round((totalScore / maxScore) * 100);
     const confidence = Math.min(95, Math.max(60, scorePercentage + Math.random() * 10));
     
-    // Adjust thresholds based on trusted company status and mutual connections
+    // Adjust thresholds based on mutual connections
     let isGhostJob: boolean;
     let summary: string;
     
-    const hasStrongIndicators = trustedCompanyCheck.isTrusted || mutualConnectionsCheck.hasMutuals;
-    
-    if (hasStrongIndicators) {
-      // More lenient for trusted companies or jobs with mutual connections
+    if (mutualConnectionsCheck.hasMutuals) {
+      // More lenient for jobs with mutual connections
       isGhostJob = scorePercentage < 35;
-      
-      if (trustedCompanyCheck.isTrusted && mutualConnectionsCheck.hasMutuals) {
-        summary = `Excellent opportunity! This job is from ${trustedCompanyCheck.companyName}, a trusted company, AND you have ${mutualConnectionsCheck.connectionType?.toLowerCase()}. This is very likely legitimate.`;
-      } else if (trustedCompanyCheck.isTrusted) {
-        summary = `This appears to be a legitimate job posting from ${trustedCompanyCheck.companyName}, a trusted company. The posting meets most quality standards.`;
-      } else if (mutualConnectionsCheck.hasMutuals) {
-        summary = `Strong legitimacy indicator: You have ${mutualConnectionsCheck.connectionType?.toLowerCase()} at this company. Jobs through personal networks are typically genuine.`;
-      }
+      summary = `Strong legitimacy indicator: You have ${mutualConnectionsCheck.connectionType?.toLowerCase()} at this company. Jobs through personal networks are typically genuine.`;
     } else {
-      // Standard thresholds for unknown companies without connections
+      // Standard thresholds for jobs without connections
       isGhostJob = scorePercentage < 60;
       if (scorePercentage >= 75) {
         summary = 'This appears to be a legitimate job posting with comprehensive details and professional presentation.';
@@ -481,11 +391,7 @@ const JobAnalyzer: React.FC = () => {
       recommendations.push(`🤝 Leverage your ${mutualConnectionsCheck.connectionType?.toLowerCase()}: Reach out to your connection for insider insights about the role and company culture`);
     }
     
-    if (trustedCompanyCheck.isTrusted) {
-      recommendations.push(`✅ Verified company: ${trustedCompanyCheck.companyName} is a well-established, reputable organization`);
-    } else {
-      recommendations.push('🔍 Research the company thoroughly - check their website, LinkedIn, and recent news');
-    }
+    recommendations.push('🔍 Research the company thoroughly - check their website, LinkedIn, and recent news');
     
     if (!mutualConnectionsCheck.hasMutuals) {
       recommendations.push('🌐 Try to find mutual connections on LinkedIn who work at this company for additional validation');
@@ -545,7 +451,7 @@ const JobAnalyzer: React.FC = () => {
     switch (category) {
       case 'Network & Connections':
         return <UserCheck className="h-5 w-5" />;
-      case 'Company Verification':
+      case 'Company Information':
         return <Building className="h-5 w-5" />;
       case 'Job Description Quality':
         return <FileText className="h-5 w-5" />;
@@ -562,138 +468,212 @@ const JobAnalyzer: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
-      {/* Input Section */}
-      <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 shadow-2xl">
-        <div className="flex items-center space-x-3 mb-6">
-          <div className="p-2 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl">
-            <Brain className="h-6 w-6 text-white" />
-          </div>
-          <h2 className="text-2xl font-bold text-white">AI Job Analysis</h2>
-          <div className="px-3 py-1 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 rounded-full">
-            <span className="text-green-300 text-sm font-medium">100+ Detection Factors</span>
-          </div>
-        </div>
+      {/* Input Section - Hero Style Glassmorphism */}
+      <div className="relative bg-black/20 backdrop-blur-2xl border border-white/10 rounded-3xl p-8 shadow-2xl overflow-hidden">
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 rounded-3xl"></div>
         
-        <div className="space-y-4">
-          <label className="block text-sm font-medium text-gray-300">
-            Paste the job description below:
-          </label>
-          <textarea
-            value={jobDescription}
-            onChange={(e) => setJobDescription(e.target.value)}
-            placeholder="Paste the complete job posting here, including company name, job title, requirements, responsibilities, and any other details...
+        {/* Glow effect */}
+        <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-purple-500/10 via-violet-500/10 to-indigo-500/10 opacity-50 blur-xl"></div>
+        
+        <div className="relative">
+          <div className="flex items-center space-x-4 mb-8">
+            <div className="relative">
+              <div className="p-3 bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl shadow-lg">
+                <Brain className="h-8 w-8 text-white" />
+              </div>
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
+                <Sparkles className="h-2 w-2 text-white" />
+              </div>
+            </div>
+            <div>
+              <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-violet-400 to-indigo-400">
+                AI Job Verification
+              </h2>
+              <p className="text-gray-300 font-medium">Advanced Ghost Job Detection</p>
+            </div>
+            <div className="px-4 py-2 bg-gradient-to-r from-green-600/20 to-emerald-600/20 border border-green-500/30 rounded-full backdrop-blur-xl">
+              <span className="text-green-300 text-sm font-bold flex items-center">
+                <Zap className="h-4 w-4 mr-1" />
+                100+ Detection Factors
+              </span>
+            </div>
+          </div>
+          
+          <div className="space-y-6">
+            <div>
+              <label className="block text-lg font-semibold text-white mb-3">
+                Paste the job description below:
+              </label>
+              <textarea
+                value={jobDescription}
+                onChange={(e) => setJobDescription(e.target.value)}
+                placeholder="Paste the complete job posting here, including company name, job title, requirements, responsibilities, and any other details...
 
 💡 Pro tip: If you have mutual connections at the company or were referred by someone, mention that in the description for more accurate analysis!"
-            className="w-full h-64 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none backdrop-blur-sm"
-          />
-          
-          <button
-            onClick={handleAnalyze}
-            disabled={!jobDescription.trim() || isAnalyzing}
-            className="w-full py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-purple-500/25 transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2"
-          >
-            {isAnalyzing ? (
-              <>
-                <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
-                <span>Analyzing with AI...</span>
-              </>
-            ) : (
-              <>
-                <Brain className="h-5 w-5" />
-                <span>Analyze Job Posting</span>
-              </>
-            )}
-          </button>
+                className="w-full h-64 px-6 py-4 bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-white/20 resize-none shadow-lg transition-all duration-300"
+              />
+            </div>
+            
+            <button
+              onClick={handleAnalyze}
+              disabled={!jobDescription.trim() || isAnalyzing}
+              className="group relative w-full py-6 bg-black/20 backdrop-blur-xl border border-white/20 text-white font-bold text-lg rounded-2xl shadow-2xl hover:bg-black/30 hover:border-white/30 transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 via-violet-500/20 to-indigo-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+              <div className="relative flex items-center justify-center space-x-3">
+                {isAnalyzing ? (
+                  <>
+                    <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                    <span>Analyzing with AI...</span>
+                  </>
+                ) : (
+                  <>
+                    <Brain className="h-6 w-6 group-hover:animate-pulse" />
+                    <span>Analyze Job Posting</span>
+                    <Target className="h-6 w-6 group-hover:scale-110 transition-transform duration-300" />
+                  </>
+                )}
+              </div>
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Results Section */}
       {analysis && (
-        <div className="space-y-6">
-          {/* Overall Result */}
-          <div className={`bg-white/10 backdrop-blur-xl border rounded-2xl p-8 shadow-2xl ${
+        <div className="space-y-8">
+          {/* Overall Result - Hero Style */}
+          <div className={`relative bg-black/20 backdrop-blur-2xl border rounded-3xl p-8 shadow-2xl overflow-hidden ${
             analysis.isGhostJob 
-              ? 'border-red-500/30 bg-red-500/5' 
-              : 'border-green-500/30 bg-green-500/5'
+              ? 'border-red-500/30' 
+              : 'border-green-500/30'
           }`}>
-            <div className="flex items-start space-x-4">
-              <div className={`p-3 rounded-xl ${
+            {/* Gradient overlay */}
+            <div className={`absolute inset-0 rounded-3xl ${
+              analysis.isGhostJob 
+                ? 'bg-gradient-to-br from-red-500/10 via-transparent to-red-500/5' 
+                : 'bg-gradient-to-br from-green-500/10 via-transparent to-green-500/5'
+            }`}></div>
+            
+            {/* Glow effect */}
+            <div className={`absolute inset-0 rounded-3xl blur-xl opacity-30 ${
+              analysis.isGhostJob 
+                ? 'bg-gradient-to-r from-red-500/20 to-orange-500/20' 
+                : 'bg-gradient-to-r from-green-500/20 to-emerald-500/20'
+            }`}></div>
+            
+            <div className="relative flex items-start space-x-6">
+              <div className={`p-4 rounded-2xl backdrop-blur-xl border border-white/10 shadow-lg ${
                 analysis.isGhostJob 
                   ? 'bg-red-500/20 text-red-400' 
                   : 'bg-green-500/20 text-green-400'
               }`}>
                 {analysis.isGhostJob ? (
-                  <AlertTriangle className="h-8 w-8" />
+                  <AlertTriangle className="h-10 w-10" />
                 ) : (
-                  <CheckCircle className="h-8 w-8" />
+                  <CheckCircle className="h-10 w-10" />
                 )}
               </div>
               
               <div className="flex-1">
-                <div className="flex items-center space-x-3 mb-2">
-                  <h3 className={`text-2xl font-bold ${
+                <div className="flex items-center space-x-4 mb-4">
+                  <h3 className={`text-3xl font-bold ${
                     analysis.isGhostJob ? 'text-red-400' : 'text-green-400'
                   }`}>
                     {analysis.isGhostJob ? 'Potential Ghost Job' : 'Likely Legitimate Job'}
                   </h3>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-gray-300 text-sm">Confidence:</span>
-                    <span className="text-white font-bold">{analysis.confidence}%</span>
+                  <div className="flex items-center space-x-3 px-4 py-2 bg-black/20 backdrop-blur-xl border border-white/10 rounded-full">
+                    <span className="text-gray-300 font-medium">Confidence:</span>
+                    <span className="text-white font-bold text-lg">{analysis.confidence}%</span>
                   </div>
                 </div>
                 
-                <p className="text-gray-300 text-lg leading-relaxed mb-4">
+                <p className="text-gray-200 text-xl leading-relaxed">
                   {analysis.summary}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Detailed Analysis */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Detailed Analysis - Hero Style Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {analysis.factors.map((category, categoryIndex) => (
-              <div key={categoryIndex} className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 shadow-xl">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="p-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg text-white">
-                    {getCategoryIcon(category.category)}
-                  </div>
-                  <h4 className="text-lg font-semibold text-white">{category.category}</h4>
-                </div>
+              <div key={categoryIndex} className="relative bg-black/20 backdrop-blur-2xl border border-white/10 rounded-3xl p-6 shadow-2xl overflow-hidden group hover:bg-black/30 hover:border-white/20 transition-all duration-300">
+                {/* Gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 
-                <div className="space-y-3">
-                  {category.items.map((item, itemIndex) => (
-                    <div key={itemIndex} className="flex items-start space-x-3 p-3 bg-white/5 rounded-lg border border-white/10">
-                      {getStatusIcon(item.status)}
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="font-medium text-white text-sm">{item.factor}</span>
-                          <span className="text-xs text-gray-400">Weight: {item.weight}</span>
-                        </div>
-                        <p className="text-gray-300 text-xs">{item.description}</p>
+                {/* Glow effect */}
+                <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-violet-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
+                
+                <div className="relative">
+                  <div className="flex items-center space-x-4 mb-6">
+                    <div className="p-3 bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl shadow-lg">
+                      <div className="text-white">
+                        {getCategoryIcon(category.category)}
                       </div>
                     </div>
-                  ))}
+                    <h4 className="text-xl font-bold text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-gray-200 transition-all duration-300">
+                      {category.category}
+                    </h4>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {category.items.map((item, itemIndex) => (
+                      <div key={itemIndex} className="flex items-start space-x-4 p-4 bg-black/20 backdrop-blur-xl rounded-2xl border border-white/10 shadow-lg hover:bg-black/30 transition-all duration-300">
+                        <div className="mt-1">
+                          {getStatusIcon(item.status)}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="font-semibold text-white">{item.factor}</span>
+                            <span className="text-xs text-gray-400 px-2 py-1 bg-black/20 rounded-full border border-white/10">
+                              Weight: {item.weight}
+                            </span>
+                          </div>
+                          <p className="text-gray-300 text-sm leading-relaxed">{item.description}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Recommendations */}
-          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 shadow-xl">
-            <div className="flex items-center space-x-3 mb-6">
-              <div className="p-2 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl text-white">
-                <Star className="h-6 w-6" />
-              </div>
-              <h3 className="text-xl font-bold text-white">Recommendations</h3>
-            </div>
+          {/* Recommendations - Hero Style */}
+          <div className="relative bg-black/20 backdrop-blur-2xl border border-white/10 rounded-3xl p-8 shadow-2xl overflow-hidden">
+            {/* Gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 rounded-3xl"></div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {analysis.recommendations.map((recommendation, index) => (
-                <div key={index} className="flex items-start space-x-3 p-4 bg-white/5 rounded-lg border border-white/10">
-                  <div className="text-lg">{recommendation.split(' ')[0]}</div>
-                  <p className="text-gray-300 text-sm">{recommendation.substring(recommendation.indexOf(' ') + 1)}</p>
+            {/* Glow effect */}
+            <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-purple-500/10 opacity-50 blur-xl"></div>
+            
+            <div className="relative">
+              <div className="flex items-center space-x-4 mb-8">
+                <div className="p-3 bg-black/20 backdrop-blur-xl border border-white/10 rounded-2xl shadow-lg">
+                  <Star className="h-8 w-8 text-white" />
                 </div>
-              ))}
+                <div>
+                  <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400">
+                    Smart Recommendations
+                  </h3>
+                  <p className="text-gray-300 font-medium">AI-powered insights for your job search</p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {analysis.recommendations.map((recommendation, index) => (
+                  <div key={index} className="flex items-start space-x-4 p-6 bg-black/20 backdrop-blur-xl rounded-2xl border border-white/10 shadow-lg hover:bg-black/30 hover:border-white/20 transition-all duration-300 group">
+                    <div className="text-2xl group-hover:scale-110 transition-transform duration-300">
+                      {recommendation.split(' ')[0]}
+                    </div>
+                    <p className="text-gray-300 leading-relaxed group-hover:text-gray-200 transition-colors duration-300">
+                      {recommendation.substring(recommendation.indexOf(' ') + 1)}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
