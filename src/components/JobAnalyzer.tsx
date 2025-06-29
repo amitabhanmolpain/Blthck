@@ -14,7 +14,11 @@ import {
   Star,
   Award,
   Verified,
-  UserCheck
+  UserCheck,
+  Sparkles,
+  TrendingUp,
+  Eye,
+  Zap
 } from 'lucide-react';
 
 interface AnalysisResult {
@@ -37,6 +41,45 @@ const JobAnalyzer: React.FC = () => {
   const [jobDescription, setJobDescription] = useState('');
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  // Sample job posting for placeholder
+  const sampleJobPosting = `Software Engineer - Full Stack Development
+Google Inc.
+
+About the Role:
+We are seeking a talented Full Stack Software Engineer to join our dynamic engineering team. You will be responsible for developing scalable web applications and contributing to our core platform infrastructure.
+
+Key Responsibilities:
+• Design and implement robust, scalable web applications using React, Node.js, and Python
+• Collaborate with cross-functional teams including product managers, designers, and other engineers
+• Write clean, maintainable code following best practices and coding standards
+• Participate in code reviews and contribute to technical documentation
+• Optimize application performance and ensure high availability
+
+Requirements:
+• Bachelor's degree in Computer Science or related field
+• 3+ years of experience in full-stack development
+• Proficiency in JavaScript, Python, React, Node.js, and SQL
+• Experience with cloud platforms (AWS, GCP, or Azure)
+• Strong problem-solving skills and attention to detail
+• Excellent communication and teamwork abilities
+
+What We Offer:
+• Competitive salary: $120,000 - $160,000 annually
+• Comprehensive health, dental, and vision insurance
+• 401(k) with company matching
+• Flexible work arrangements and remote work options
+• Professional development opportunities and learning budget
+• Stock options and performance bonuses
+
+How to Apply:
+Please send your resume and cover letter to careers@google.com or apply through our careers portal. We are an equal opportunity employer committed to diversity and inclusion.
+
+Contact: Sarah Johnson, Senior Technical Recruiter
+Email: sarah.johnson@google.com
+LinkedIn: linkedin.com/in/sarahjohnson-tech
+
+Note: I was referred to this position by my former colleague, Mike Chen, who currently works as a Senior Engineer in the Cloud Platform team.`;
 
   // Comprehensive list of trusted companies
   const trustedCompanies = [
@@ -520,129 +563,191 @@ const JobAnalyzer: React.FC = () => {
 
     setIsAnalyzing(true);
     
-    // Simulate API delay for better UX
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    // Simulate API delay for better UX with realistic timing
+    await new Promise(resolve => setTimeout(resolve, 2500));
     
     const result = analyzeJobPosting(jobDescription);
     setAnalysis(result);
     setIsAnalyzing(false);
   };
 
+  const handleUseSample = () => {
+    setJobDescription(sampleJobPosting);
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'good':
+        return 'text-emerald-400';
+      case 'warning':
+        return 'text-amber-400';
+      case 'bad':
+        return 'text-red-400';
+      default:
+        return 'text-gray-400';
+    }
+  };
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'good':
-        return <CheckCircle className="h-4 w-4 text-green-400" />;
+        return <CheckCircle className="h-5 w-5 text-emerald-400" />;
       case 'warning':
-        return <AlertTriangle className="h-4 w-4 text-yellow-400" />;
+        return <AlertTriangle className="h-5 w-5 text-amber-400" />;
       case 'bad':
-        return <AlertTriangle className="h-4 w-4 text-red-400" />;
+        return <AlertTriangle className="h-5 w-5 text-red-400" />;
       default:
         return null;
     }
   };
 
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case 'Network & Connections':
-        return <UserCheck className="h-5 w-5" />;
-      case 'Company Verification':
-        return <Building className="h-5 w-5" />;
-      case 'Job Description Quality':
-        return <FileText className="h-5 w-5" />;
-      case 'Contact & Application':
-        return <Mail className="h-5 w-5" />;
-      case 'Compensation & Benefits':
-        return <DollarSign className="h-5 w-5" />;
-      case 'Red Flags Assessment':
-        return <Shield className="h-5 w-5" />;
-      default:
-        return <Brain className="h-5 w-5" />;
-    }
-  };
-
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      {/* Input Section */}
-      <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 shadow-2xl">
-        <div className="flex items-center space-x-3 mb-6">
-          <div className="p-2 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl">
-            <Brain className="h-6 w-6 text-white" />
+    <div className="max-w-6xl mx-auto space-y-8">
+      {/* Header */}
+      <div className="text-center space-y-4">
+        <div className="flex items-center justify-center space-x-3">
+          <div className="p-3 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl shadow-lg">
+            <Brain className="h-8 w-8 text-white" />
           </div>
-          <h2 className="text-2xl font-bold text-white">AI Job Analysis</h2>
-          <div className="px-3 py-1 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 rounded-full">
-            <span className="text-green-300 text-sm font-medium">100+ Detection Factors</span>
-          </div>
+          <h1 className="text-4xl font-bold text-white">AI Ghost Job Detector</h1>
         </div>
-        
-        <div className="space-y-4">
-          <label className="block text-sm font-medium text-gray-300">
-            Paste the job description below:
-          </label>
+        <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+          Paste any job description below and get instant AI-powered analysis using 100+ detection factors
+        </p>
+      </div>
+
+      {/* Input Section */}
+      <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8">
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <label className="text-lg font-semibold text-gray-800">
+              Job Description Analysis
+            </label>
+            <button
+              onClick={handleUseSample}
+              className="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-medium rounded-lg hover:shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center space-x-2"
+            >
+              <Eye className="h-4 w-4" />
+              <span>Use Sample Job</span>
+            </button>
+          </div>
+          
           <textarea
             value={jobDescription}
             onChange={(e) => setJobDescription(e.target.value)}
-            placeholder="Paste the complete job posting here, including company name, job title, requirements, responsibilities, and any other details...
+            placeholder="Paste the complete job posting here...
 
-💡 Pro tip: If you have mutual connections at the company or were referred by someone, mention that in the description for more accurate analysis!"
-            className="w-full h-64 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none backdrop-blur-sm"
+💡 Pro Tips for Better Analysis:
+• Include company name, job title, and full description
+• Mention if you have mutual connections or referrals
+• Add salary, benefits, and contact information if available
+• Include any specific requirements or qualifications listed
+
+Example: 'Software Engineer at Google - I was referred by my colleague John who works there...'"
+            className="w-full h-80 px-6 py-4 border border-gray-200 rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-sm leading-relaxed"
           />
           
           <button
             onClick={handleAnalyze}
             disabled={!jobDescription.trim() || isAnalyzing}
-            className="w-full py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-purple-500/25 transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2"
+            className="w-full py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold text-lg rounded-xl hover:shadow-lg hover:shadow-purple-500/25 transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-3"
           >
             {isAnalyzing ? (
               <>
-                <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                <div className="relative">
+                  <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                  <div className="absolute inset-0 w-6 h-6 border-2 border-transparent border-t-purple-300 rounded-full animate-spin animate-reverse"></div>
+                </div>
                 <span>Analyzing with AI...</span>
+                <div className="flex space-x-1">
+                  <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
+                  <div className="w-2 h-2 bg-white rounded-full animate-bounce delay-100"></div>
+                  <div className="w-2 h-2 bg-white rounded-full animate-bounce delay-200"></div>
+                </div>
               </>
             ) : (
               <>
-                <Brain className="h-5 w-5" />
+                <Brain className="h-6 w-6" />
                 <span>Analyze Job Posting</span>
+                <Sparkles className="h-5 w-5" />
               </>
             )}
           </button>
         </div>
       </div>
 
+      {/* Loading Animation */}
+      {isAnalyzing && (
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8">
+          <div className="text-center space-y-6">
+            <div className="flex justify-center">
+              <div className="relative">
+                <div className="w-20 h-20 border-4 border-purple-200 rounded-full"></div>
+                <div className="absolute inset-0 w-20 h-20 border-4 border-transparent border-t-purple-600 rounded-full animate-spin"></div>
+                <div className="absolute inset-2 w-16 h-16 border-4 border-transparent border-t-blue-500 rounded-full animate-spin animate-reverse"></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Brain className="h-8 w-8 text-purple-600 animate-pulse" />
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-3">
+              <h3 className="text-xl font-bold text-gray-800">AI Analysis in Progress</h3>
+              <div className="space-y-2">
+                <div className="flex items-center justify-center space-x-2 text-gray-600">
+                  <Zap className="h-4 w-4 text-yellow-500 animate-pulse" />
+                  <span className="text-sm">Processing job description...</span>
+                </div>
+                <div className="flex items-center justify-center space-x-2 text-gray-600">
+                  <TrendingUp className="h-4 w-4 text-green-500 animate-pulse" />
+                  <span className="text-sm">Analyzing 100+ detection factors...</span>
+                </div>
+                <div className="flex items-center justify-center space-x-2 text-gray-600">
+                  <Shield className="h-4 w-4 text-blue-500 animate-pulse" />
+                  <span className="text-sm">Generating comprehensive report...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Results Section */}
-      {analysis && (
-        <div className="space-y-6">
+      {analysis && !isAnalyzing && (
+        <div className="space-y-8 animate-fade-in">
           {/* Overall Result */}
-          <div className={`bg-white/10 backdrop-blur-xl border rounded-2xl p-8 shadow-2xl ${
+          <div className={`bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border-2 p-8 ${
             analysis.isGhostJob 
-              ? 'border-red-500/30 bg-red-500/5' 
-              : 'border-green-500/30 bg-green-500/5'
+              ? 'border-red-300 bg-red-50/50' 
+              : 'border-emerald-300 bg-emerald-50/50'
           }`}>
-            <div className="flex items-start space-x-4">
-              <div className={`p-3 rounded-xl ${
+            <div className="flex items-start space-x-6">
+              <div className={`p-4 rounded-2xl ${
                 analysis.isGhostJob 
-                  ? 'bg-red-500/20 text-red-400' 
-                  : 'bg-green-500/20 text-green-400'
+                  ? 'bg-red-100 text-red-600' 
+                  : 'bg-emerald-100 text-emerald-600'
               }`}>
                 {analysis.isGhostJob ? (
-                  <AlertTriangle className="h-8 w-8" />
+                  <AlertTriangle className="h-12 w-12" />
                 ) : (
-                  <CheckCircle className="h-8 w-8" />
+                  <CheckCircle className="h-12 w-12" />
                 )}
               </div>
               
               <div className="flex-1">
-                <div className="flex items-center space-x-3 mb-2">
-                  <h3 className={`text-2xl font-bold ${
-                    analysis.isGhostJob ? 'text-red-400' : 'text-green-400'
+                <div className="flex items-center space-x-4 mb-4">
+                  <h2 className={`text-3xl font-bold ${
+                    analysis.isGhostJob ? 'text-red-700' : 'text-emerald-700'
                   }`}>
                     {analysis.isGhostJob ? 'Potential Ghost Job' : 'Likely Legitimate Job'}
-                  </h3>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-gray-300 text-sm">Confidence:</span>
-                    <span className="text-white font-bold">{analysis.confidence}%</span>
+                  </h2>
+                  <div className="flex items-center space-x-2 px-4 py-2 bg-white/60 rounded-full">
+                    <span className="text-gray-600 font-medium">Confidence:</span>
+                    <span className="text-2xl font-bold text-gray-800">{analysis.confidence}%</span>
                   </div>
                 </div>
                 
-                <p className="text-gray-300 text-lg leading-relaxed mb-4">
+                <p className="text-gray-700 text-lg leading-relaxed">
                   {analysis.summary}
                 </p>
               </div>
@@ -650,26 +755,33 @@ const JobAnalyzer: React.FC = () => {
           </div>
 
           {/* Detailed Analysis */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {analysis.factors.map((category, categoryIndex) => (
-              <div key={categoryIndex} className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 shadow-xl">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="p-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg text-white">
-                    {getCategoryIcon(category.category)}
+              <div key={categoryIndex} className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6">
+                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center space-x-2">
+                  <div className="p-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg text-white">
+                    {category.category === 'Network & Connections' && <UserCheck className="h-4 w-4" />}
+                    {category.category === 'Company Verification' && <Building className="h-4 w-4" />}
+                    {category.category === 'Job Description Quality' && <FileText className="h-4 w-4" />}
+                    {category.category === 'Contact & Application' && <Mail className="h-4 w-4" />}
+                    {category.category === 'Compensation & Benefits' && <DollarSign className="h-4 w-4" />}
+                    {category.category === 'Red Flags Assessment' && <Shield className="h-4 w-4" />}
                   </div>
-                  <h4 className="text-lg font-semibold text-white">{category.category}</h4>
-                </div>
+                  <span>{category.category}</span>
+                </h3>
                 
                 <div className="space-y-3">
                   {category.items.map((item, itemIndex) => (
-                    <div key={itemIndex} className="flex items-start space-x-3 p-3 bg-white/5 rounded-lg border border-white/10">
+                    <div key={itemIndex} className="flex items-start space-x-3 p-3 bg-gray-50/80 rounded-lg border border-gray-100">
                       {getStatusIcon(item.status)}
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-1">
-                          <span className="font-medium text-white text-sm">{item.factor}</span>
-                          <span className="text-xs text-gray-400">Weight: {item.weight}</span>
+                          <span className="font-semibold text-gray-800 text-sm">{item.factor}</span>
+                          <span className="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded-full">
+                            +{item.weight}
+                          </span>
                         </div>
-                        <p className="text-gray-300 text-xs">{item.description}</p>
+                        <p className="text-gray-600 text-xs leading-relaxed">{item.description}</p>
                       </div>
                     </div>
                   ))}
@@ -679,25 +791,50 @@ const JobAnalyzer: React.FC = () => {
           </div>
 
           {/* Recommendations */}
-          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 shadow-xl">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-8">
             <div className="flex items-center space-x-3 mb-6">
-              <div className="p-2 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl text-white">
+              <div className="p-3 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl text-white">
                 <Star className="h-6 w-6" />
               </div>
-              <h3 className="text-xl font-bold text-white">Recommendations</h3>
+              <h3 className="text-2xl font-bold text-gray-800">Recommendations</h3>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {analysis.recommendations.map((recommendation, index) => (
-                <div key={index} className="flex items-start space-x-3 p-4 bg-white/5 rounded-lg border border-white/10">
-                  <div className="text-lg">{recommendation.split(' ')[0]}</div>
-                  <p className="text-gray-300 text-sm">{recommendation.substring(recommendation.indexOf(' ') + 1)}</p>
+                <div key={index} className="flex items-start space-x-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100">
+                  <div className="text-2xl flex-shrink-0">{recommendation.split(' ')[0]}</div>
+                  <p className="text-gray-700 text-sm leading-relaxed font-medium">
+                    {recommendation.substring(recommendation.indexOf(' ') + 1)}
+                  </p>
                 </div>
               ))}
             </div>
           </div>
         </div>
       )}
+
+      <style jsx>{`
+        @keyframes fade-in {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes reverse {
+          from { transform: rotate(360deg); }
+          to { transform: rotate(0deg); }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.6s ease-out;
+        }
+        .animate-reverse {
+          animation: reverse 1.5s linear infinite;
+        }
+        .delay-100 {
+          animation-delay: 0.1s;
+        }
+        .delay-200 {
+          animation-delay: 0.2s;
+        }
+      `}</style>
     </div>
   );
 };
